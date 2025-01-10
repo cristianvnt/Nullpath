@@ -17,6 +17,6 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp)
+add_executable(main src/main.cpp src/Game.cpp)
 
-target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System)
+target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)

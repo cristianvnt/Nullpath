@@ -1,19 +1,9 @@
-#include <SFML/Graphics.hpp>
+#include "../headers/Game.h"
 
 int main()
 {
-	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode({ 800u, 600u }), "The Abyssal Shift");
-	window.setFramerateLimit(60);
+	Game game;
+	game.run();
 
-	while (window.isOpen())
-	{
-		while (const std::optional event = window.pollEvent())
-		{
-			if (event->is<sf::Event::Closed>())
-				window.close();
-		}
-
-		window.clear();
-		window.display();
-	}
+	return 0;
 }
