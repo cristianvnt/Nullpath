@@ -1,9 +1,11 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef STATE_H
+#define STATE_H
 
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -11,21 +13,17 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
 
-class Game
+class State
 {
 private:
-	sf::RenderWindow* window;
-
-	void initWindow();
+	std::vector<sf::Texture> textures;
 
 public:
-	Game();
-	virtual ~Game();
+	State();
+	virtual ~State();
 
-	void updateEvents();
-	void update();
-	void render();
-	void run();
+	virtual void Update() = 0;
+	virtual void Render() = 0;
 };
 
 #endif

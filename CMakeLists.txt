@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(The-Abyssal-Shift LANGUAGES CXX)
+project(Abyssal-Fracture LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+configure_file(${CMAKE_SOURCE_DIR}/src/config/window.ini ${CMAKE_BINARY_DIR}/bin/window.ini COPYONLY)
 
 include(FetchContent)
 
@@ -17,6 +19,11 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp src/Game.cpp)
+file(GLOB
+    SOURCES
+    "src/game/**/*.cpp"
+)
+
+add_executable(main ${SOURCES})
 
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
