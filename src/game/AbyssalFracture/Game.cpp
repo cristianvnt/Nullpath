@@ -2,19 +2,25 @@
 
 void Game::InitWindow()
 {
-	std::ifstream wCfg("window.ini");
+	std::ifstream ifs("window.ini");
+
+	if (!ifs.is_open())
+	{
+		std::cerr << "Error: window.ini could not be opened.\n";
+		return;
+	}
 
 	std::string title = "None";
 	sf::VideoMode windowBounds({ 800, 600 });
 	unsigned framerateLimit = 60;
 	bool verticalSyncEnabled = false;
 
-	if (wCfg.is_open())
+	if (ifs)
 	{
-		std::getline(wCfg, title);
-		wCfg >> windowBounds.size.x >> windowBounds.size.y;
-		wCfg >> framerateLimit;
-		wCfg >> verticalSyncEnabled;
+		std::getline(ifs, title);
+		ifs >> windowBounds.size.x >> windowBounds.size.y;
+		ifs >> framerateLimit;
+		ifs >> verticalSyncEnabled;
 	}
 
 	this->window = new sf::RenderWindow(windowBounds, title);
@@ -22,14 +28,39 @@ void Game::InitWindow()
 	this->window->setVerticalSyncEnabled(verticalSyncEnabled);
 }
 
+void Game::InitKeys()
+{
+	std::ifstream ifs("supportedKeys.ini");
+
+	if (!ifs.is_open())
+	{
+		std::cerr << "Error: supported_keys.ini could not be opened.\n";
+		return;
+	}
+
+	if (ifs)
+	{
+		std::string key;
+		int key_value = 0;
+
+		while (ifs >> key >> key_value)
+			this->supportedKeys[key] = static_cast<sf::Keyboard::Key>(key_value);
+	}
+
+	// DEBUG
+	for (auto& i : this->supportedKeys)
+		std::cout << i.first << " " << static_cast<int>(i.second) << "\n";
+}
+
 void Game::InitStates()
 {
-	this->states.push(new GameState(this->window));
+	this->states.push(new GameState(this->window, &this->supportedKeys));
 }
 
 Game::Game()
 {
 	this->InitWindow();
+	this->InitKeys();
 	this->InitStates();
 }
 

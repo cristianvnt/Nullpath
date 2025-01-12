@@ -1,37 +1,32 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include <iostream>
-#include <ctime>
-#include <cstdlib>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <stack>
-#include <map>
-
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/System.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
+#include "../Entities/Entity.h"
 
 class State
 {
 private:
+
+protected:
 	sf::RenderWindow* window;
-	std::vector<sf::Texture> textures;
+	std::map<std::string, sf::Keyboard::Key>* supportedKeys;
+	std::map<std::string, sf::Keyboard::Key> keybinds;
 	bool quit;
 
+	std::vector<sf::Texture> textures;
+
+	// Functions
+	virtual void InitKeybinds() = 0;
+
 public:
-	State(sf::RenderWindow* window);
+	State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys);
 	virtual ~State();
 
 	const bool& GetQuit() const;
 	virtual void CheckQuitState();
 
 	virtual void EndState() = 0;
-	virtual void UpdateKeybinds(const float& dt) = 0;
+	virtual void UpdateInput(const float& dt) = 0;
 	virtual void Update(const float& dt) = 0;
 	virtual void Render(sf::RenderTarget* target = nullptr) = 0;
 };

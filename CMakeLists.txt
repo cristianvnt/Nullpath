@@ -7,7 +7,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-configure_file(${CMAKE_SOURCE_DIR}/src/config/window.ini ${CMAKE_BINARY_DIR}/bin/window.ini COPYONLY)
+file(GLOB CONFIG_FILES "${CMAKE_SOURCE_DIR}/src/config/*.ini")
+foreach(config_file ${CONFIG_FILES})
+    configure_file(${config_file} ${CMAKE_BINARY_DIR}/bin/ COPYONLY)
+endforeach()
+
 
 include(FetchContent)
 
@@ -19,10 +23,7 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-file(GLOB
-    SOURCES
-    "src/game/**/*.cpp"
-)
+file(GLOB SOURCES "src/game/**/*.cpp")
 
 add_executable(main ${SOURCES})
 

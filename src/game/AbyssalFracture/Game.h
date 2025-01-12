@@ -13,8 +13,11 @@ private:
 
 	std::stack<State*> states;
 
+	std::map<std::string, sf::Keyboard::Key> supportedKeys;
+
 	void InitWindow();
 	void InitStates();
+	void InitKeys();
 
 public:
 	Game();
