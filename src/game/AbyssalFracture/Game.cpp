@@ -37,7 +37,7 @@ Game::~Game()
 {
 	delete this->window;
 
-	while (this->states.empty())
+	while (!this->states.empty())
 	{
 		delete this->states.top();
 		this->states.pop();
