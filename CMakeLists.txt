@@ -7,23 +7,25 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
 file(GLOB CONFIG_FILES "${CMAKE_SOURCE_DIR}/src/config/*.ini")
 foreach(config_file ${CONFIG_FILES})
-    configure_file(${config_file} ${CMAKE_BINARY_DIR}/bin/ COPYONLY)
+    configure_file(${config_file} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COPYONLY)
 endforeach()
 
-
 include(FetchContent)
-
-FetchContent_Declare(SFML
+FetchContent_Declare(
+    SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
     GIT_TAG 3.0.0
     GIT_SHALLOW ON
     EXCLUDE_FROM_ALL
-    SYSTEM)
+    SYSTEM
+)
 FetchContent_MakeAvailable(SFML)
 
-file(GLOB SOURCES "src/game/**/*.cpp")
+file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/game/**/*.cpp")
 
 add_executable(main ${SOURCES})
 
