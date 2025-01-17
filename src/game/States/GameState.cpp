@@ -2,7 +2,7 @@
 
 void GameState::InitKeybinds()
 {
-	std::ifstream ifs("gameStateKeybinds.ini");
+	std::ifstream ifs("resources/config/gameStateKeybinds.ini");
 
 	if (!ifs.is_open())
 	{
@@ -10,14 +10,11 @@ void GameState::InitKeybinds()
 		return;
 	}
 
-	if (ifs)
-	{
-		std::string fnc;
-		std::string keyStr;
+	std::string fnc;
+	std::string keyStr;
 
-		while (ifs >> fnc >> keyStr)
-			this->keybinds[fnc] = this->supportedKeys->at(keyStr);
-	}
+	while (ifs >> fnc >> keyStr)
+		this->keybinds[fnc] = this->supportedKeys->at(keyStr);
 }
 
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys)

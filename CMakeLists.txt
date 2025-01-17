@@ -9,10 +9,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-file(GLOB CONFIG_FILES "${CMAKE_SOURCE_DIR}/src/config/*.ini")
-foreach(config_file ${CONFIG_FILES})
-    configure_file(${config_file} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COPYONLY)
-endforeach()
+#Define resource dirs
+set(RESOURCES_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/resources")
+set(RESOURCES_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources")
+
+#Copy resource dirs
+file(COPY ${RESOURCES_SOURCE_DIR} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 include(FetchContent)
 FetchContent_Declare(

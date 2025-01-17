@@ -2,10 +2,12 @@
 
 void Game::InitWindow()
 {
-	std::ifstream ifs("window.ini");
+	std::ifstream ifs("resources/config/window.ini");
 
 	if (!ifs.is_open())
 	{
+		std::cout << "Current working directory: "
+			<< std::filesystem::current_path() << "\n";
 		std::cerr << "Error: window.ini could not be opened.\n";
 		return;
 	}
@@ -30,7 +32,7 @@ void Game::InitWindow()
 
 void Game::InitKeys()
 {
-	std::ifstream ifs("supportedKeys.ini");
+	std::ifstream ifs("resources/config/supportedKeys.ini");
 
 	if (!ifs.is_open())
 	{
@@ -38,14 +40,11 @@ void Game::InitKeys()
 		return;
 	}
 
-	if (ifs)
-	{
-		std::string key;
-		int key_value = 0;
+	std::string key;
+	int key_value = 0;
 
-		while (ifs >> key >> key_value)
-			this->supportedKeys[key] = static_cast<sf::Keyboard::Key>(key_value);
-	}
+	while (ifs >> key >> key_value)
+		this->supportedKeys[key] = static_cast<sf::Keyboard::Key>(key_value);
 
 	// DEBUG
 	for (auto& i : this->supportedKeys)

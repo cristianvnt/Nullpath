@@ -2,9 +2,9 @@
 
 void MainMenuState::InitFonts()
 {
-	if (!this->font.openFromFile("fonts/Stroke.ttf")) 
+	if (!this->font.openFromFile("resources/fonts/Stroke.ttf"))
 	{
-		std::cerr << "Failed to load font!" << std::endl;
+		std::cerr << "Failed to load font!\n";
 		return;
 	}
 }
