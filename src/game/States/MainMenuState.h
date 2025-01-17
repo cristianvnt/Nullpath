@@ -7,10 +7,14 @@
 class MainMenuState : public State
 {
 private:
-	// Vars
+	//Vars
 	sf::RectangleShape background;
+	sf::Font font;
 
-	// Functions
+	Button* gameStateBTN;
+
+	//Functions
+	void InitFonts();
 	void InitKeybinds() override;
 
 public:

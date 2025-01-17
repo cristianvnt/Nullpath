@@ -8,7 +8,7 @@ class GameState : public State
 private:
 	Entity player;
 
-	// Functions
+	//Functions
 	void InitKeybinds() override;
 
 public:

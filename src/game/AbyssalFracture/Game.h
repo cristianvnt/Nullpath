@@ -23,18 +23,18 @@ public:
 	Game();
 	virtual ~Game();
 
-	// Functions
+	//Functions
 	void EndApplication();
 
-	// Updates
+	//Updates
 	void UpdateDt();
 	void UpdateEvents();
 	void Update();
 
-	// Render
+	//Render
 	void Render();
 
-	// Core
+	//Core
 	void Run();
 };
 
