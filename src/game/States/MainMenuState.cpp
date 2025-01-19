@@ -11,7 +11,7 @@ void MainMenuState::InitFonts()
 
 void MainMenuState::InitKeybinds()
 {
-	std::ifstream ifs("gameStateKeybinds.ini");
+	std::ifstream ifs("resources/config/gameStateKeybinds.ini");
 
 	if (!ifs.is_open())
 	{

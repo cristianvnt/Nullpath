@@ -6,8 +6,6 @@ void Game::InitWindow()
 
 	if (!ifs.is_open())
 	{
-		std::cout << "Current working directory: "
-			<< std::filesystem::current_path() << "\n";
 		std::cerr << "Error: window.ini could not be opened.\n";
 		return;
 	}
