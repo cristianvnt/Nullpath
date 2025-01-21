@@ -2,7 +2,7 @@
 
 void GameState::InitKeybinds()
 {
-	std::ifstream ifs("resources/config/gameStateKeybinds.ini");
+	std::ifstream ifs("resources/Config/gameStateKeybinds.ini");
 
 	if (!ifs.is_open())
 	{
@@ -17,8 +17,8 @@ void GameState::InitKeybinds()
 		this->keybinds[fnc] = this->supportedKeys->at(keyStr);
 }
 
-GameState::GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys)
-	: State(window, supportedKeys)
+GameState::GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states)
+	: State(window, supportedKeys, states)
 {
 	this->InitKeybinds();
 }
@@ -35,6 +35,7 @@ void GameState::EndState()
 void GameState::UpdateInput(const float& dt)
 {
 	this->CheckQuitState();
+
 	if (sf::Keyboard::isKeyPressed(this->keybinds["MOVE_LEFT"]))
 	{
 		this->player.Move(dt, -1.f, 0.f);

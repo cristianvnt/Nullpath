@@ -1,14 +1,16 @@
 #include "State.h"
 
-State::State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys)
+State::State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states)
 {
 	this->window = window;
 	this->supportedKeys = supportedKeys;
+	this->states = states;
 	this->quit = false;
 }
 
 State::~State()
 {
+
 }
 
 const bool& State::GetQuit() const

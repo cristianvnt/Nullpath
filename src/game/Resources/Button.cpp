@@ -14,10 +14,8 @@ Button::Button(float x, float y, float width, float height,
 	this->text.setString(text);
 	this->text.setFillColor(sf::Color::White);
 	this->text.setCharacterSize(30);
-	this->text.setPosition(
-		{ this->shape.getPosition().x + (this->shape.getSize().x / 2.f) - (this->text.getGlobalBounds().position.x / 2.f),
-		this->shape.getPosition().y + (this->shape.getSize().y / 2.f) - (this->text.getGlobalBounds().position.y / 2.f) }
-	);
+	this->text.setOrigin({ this->text.getLocalBounds().position + this->text.getLocalBounds().size / 2.f });
+	this->text.setPosition({ this->shape.getPosition() + this->shape.getSize() / 2.f });
 
 	this->idleColor = idleColor;
 	this->hoverColor = hoverColor;

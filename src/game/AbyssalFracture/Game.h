@@ -7,6 +7,9 @@ class Game
 {
 private:
 	sf::RenderWindow* window;
+	std::vector<sf::VideoMode> videoModes;
+	sf::ContextSettings windowSettings;
+	bool fullscreen;
 
 	sf::Clock dtClock;
 	float dt;
@@ -15,6 +18,7 @@ private:
 
 	std::map<std::string, sf::Keyboard::Key> supportedKeys;
 
+	void InitVariables();
 	void InitWindow();
 	void InitStates();
 	void InitKeys();

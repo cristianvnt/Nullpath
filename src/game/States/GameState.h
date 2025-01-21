@@ -12,7 +12,7 @@ private:
 	void InitKeybinds() override;
 
 public:
-	GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys);
+	GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states);
 	virtual ~GameState();
 
 	void EndState() override;
