@@ -13,11 +13,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-#Define resource dirs
+# Define resource dirs
 set(RESOURCES_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/resources")
 set(RESOURCES_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-#Copy resource dirs
+# Copy resource dirs
 file(COPY ${RESOURCES_SOURCE_DIR} DESTINATION ${RESOURCES_OUTPUT_DIR})
 
 include(FetchContent)
@@ -37,22 +37,14 @@ add_executable(main ${SOURCES})
 
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
 
-#Build type-specific settings
+# Build type-specific settings
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message(STATUS "Config for Debug mode with MSVC")
+        message(STATUS "Debug mode with MSVC")
         target_compile_options(main PRIVATE /Zi /Od)
-        target_link_options(main PRIVATE /DEBUG)
+        target_link_options(main PRIVATE /DEBUG /INCREMENTAL)
     elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        message(STATUS "Config for Release mode with MSVC")
+        message(STATUS "Release mode with MSVC")
         target_compile_options(main PRIVATE /O2)
-    endif()
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message(STATUS "Config for Debug mode with GCC/Clang")
-        target_compile_options(main PRIVATE -g)
-    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        message(STATUS "Config for Release mode with GCC/Clang")
-        target_compile_options(main PRIVATE -O3)
     endif()
 endif()

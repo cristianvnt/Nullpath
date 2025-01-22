@@ -13,7 +13,7 @@ Button::Button(float x, float y, float width, float height,
 	this->text.setFont(*this->font);
 	this->text.setString(text);
 	this->text.setFillColor(sf::Color::White);
-	this->text.setCharacterSize(30);
+	this->text.setCharacterSize(20);
 	this->text.setOrigin({ this->text.getLocalBounds().position + this->text.getLocalBounds().size / 2.f });
 	this->text.setPosition({ this->shape.getPosition() + this->shape.getSize() / 2.f });
 
@@ -28,24 +28,15 @@ Button::~Button()
 {
 }
 
-const bool Button::isPressed() const
-{
-	if (this->buttonState == BTN_ACTIVE)
-		return true;
+// Accessors
 
-	return false;
-}
-
-//Accessors
-
-
-//Functions
+// Functions
 void Button::Update(const sf::Vector2f mousePos)
 {
-	//Idle
+	// Idle
 	this->buttonState = BTN_IDLE;
 
-	//Hover
+	// Hover
 	if (this->shape.getGlobalBounds().contains(mousePos))
 	{
 		this->buttonState = BTN_HOVER;

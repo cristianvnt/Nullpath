@@ -18,10 +18,10 @@ protected:
 	sf::Vector2i mousePosWindow;
 	sf::Vector2f mousePosView;
 
-	//Resources
+	// Resources
 	std::vector<sf::Texture> textures;
 
-	//Functions
+	// Functions
 	virtual void InitKeybinds() = 0;
 
 public:

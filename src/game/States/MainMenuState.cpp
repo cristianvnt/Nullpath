@@ -1,8 +1,28 @@
 #include "MainMenuState.h"
 
+void MainMenuState::InitVariables()
+{
+}
+
+void MainMenuState::InitBackground()
+{
+	this->background.setSize({
+		static_cast<float>(this->window->getSize().x),
+		static_cast<float>(this->window->getSize().y)
+		});
+
+	if (!this->backgroundTexture.loadFromFile("resources/Images/Backgrounds/mainMenuBG.png"))
+	{
+		std::cerr << "ERR::MAIN_MENU_STATE::ERROR_LOADING_BACKGROUND_TEXTURE\n";
+		return;
+	}
+
+	this->background.setTexture(&this->backgroundTexture);
+}
+
 void MainMenuState::InitFonts()
 {
-	if (!this->font.openFromFile("resources/Fonts/Stroke.ttf"))
+	if (!this->font.openFromFile("resources/Fonts/ThemeVCK.ttf"))
 	{
 		std::cerr << "Failed to load font!\n";
 		return;
@@ -43,12 +63,11 @@ void MainMenuState::InitButtons()
 MainMenuState::MainMenuState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states)
 	: State(window, supportedKeys, states)
 {
+	this->InitVariables();
+	this->InitBackground();
 	this->InitFonts();
 	this->InitKeybinds();
 	this->InitButtons();
-
-	this->background.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
-	this->background.setFillColor(sf::Color::Black);
 }
 
 MainMenuState::~MainMenuState()

@@ -36,10 +36,10 @@ public:
 		sf::Color idleColor, sf::Color hoverColor, sf::Color activeColor);
 	virtual ~Button();
 
-	//Accessors
-	const bool isPressed() const;
+	// Accessors
+	inline const bool isPressed() const { return this->buttonState == BTN_ACTIVE; }
 
-	//Functions
+	// Functions
 	void Update(const sf::Vector2f mousePos);
 	void Render(sf::RenderTarget* target);
 };
