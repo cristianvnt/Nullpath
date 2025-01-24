@@ -1,8 +1,8 @@
-#ifndef MAINMENUSTATE_H
-#define MAINMENUSTATE_H
+#ifndef MAIN_MENU_STATE_H
+#define MAIN_MENU_STATE_H
 
-#include "GameState.h"
-#include "../Resources/Button.h"
+#include "States/Gameplay/GameState.h"
+#include "UI/Widgets/Button.h"
 
 class MainMenuState : public State
 {
@@ -24,8 +24,6 @@ private:
 public:
 	MainMenuState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states);
 	virtual ~MainMenuState();
-
-	void EndState() override;
 
 	void UpdateInput(const float& dt) override;
 	void UpdateButtons();

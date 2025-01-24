@@ -1,5 +1,23 @@
 #include "Game.h"
 
+Game::Game()
+{
+	this->InitWindow();
+	this->InitKeys();
+	this->InitStates();
+}
+
+Game::~Game()
+{
+	delete this->window;
+
+	while (!this->states.empty())
+	{
+		delete this->states.top();
+		this->states.pop();
+	}
+}
+
 void Game::InitVariables()
 {
 	this->window = nullptr;
@@ -9,7 +27,7 @@ void Game::InitVariables()
 
 void Game::InitWindow()
 {
-	std::ifstream ifs("resources/Config/window.ini");
+	std::ifstream ifs("Config/window.ini");
 
 	if (!ifs.is_open())
 	{
@@ -43,7 +61,7 @@ void Game::InitWindow()
 	if (this->fullscreen)
 		this->window = new sf::RenderWindow(windowBounds, title, sf::State::Fullscreen, this->windowSettings);
 	else
-		this->window = new sf::RenderWindow(windowBounds, title, sf::Style::Titlebar | sf::Style::Close, 
+		this->window = new sf::RenderWindow(windowBounds, title, sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize, 
 			sf::State::Windowed, this->windowSettings);
 
 	this->window->setFramerateLimit(framerateLimit);
@@ -52,7 +70,7 @@ void Game::InitWindow()
 
 void Game::InitKeys()
 {
-	std::ifstream ifs("resources/Config/supportedKeys.ini");
+	std::ifstream ifs("Config/supportedKeys.ini");
 
 	if (!ifs.is_open())
 	{
@@ -74,24 +92,6 @@ void Game::InitKeys()
 void Game::InitStates()
 {
 	this->states.push(new MainMenuState(this->window, &this->supportedKeys, &this->states));
-}
-
-Game::Game()
-{
-	this->InitWindow();
-	this->InitKeys();
-	this->InitStates();
-}
-
-Game::~Game()
-{
-	delete this->window;
-
-	while (!this->states.empty())
-	{
-		delete this->states.top();
-		this->states.pop();
-	}
 }
 
 void Game::EndApplication()

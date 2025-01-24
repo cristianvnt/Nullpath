@@ -1,21 +1,21 @@
-#ifndef GAMESTATE_H
-#define GAMESTATE_H
+#ifndef GAME_STATE_H
+#define GAME_STATE_H
 
-#include "State.h"
+#include "States/Base/State.h"
 
 class GameState : public State
 {
 private:
-	Entity player;
+	Player* player;
 
-	//Functions
+	// Functions
 	void InitKeybinds() override;
+	void InitTextures();
+	void InitPlayers();
 
 public:
 	GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states);
 	virtual ~GameState();
-
-	void EndState() override;
 
 	void UpdateInput(const float& dt) override;
 	void Update(const float& dt) override;
