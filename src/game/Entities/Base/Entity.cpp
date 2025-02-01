@@ -1,60 +1,52 @@
 #include "Entity.h"
 
-Entity::Entity()
+Entity::Entity(const sf::Texture& texture)
+	: sprite(texture)
 {
 	this->InitVariables();
 }
 
 Entity::~Entity()
 {
-	delete this->sprite;
+	delete this->movementComponent;
 }
 
 void Entity::InitVariables()
 {
-	this->texture = nullptr;
-	this->sprite = nullptr;
 	this->movementComponent = nullptr;
 }
 
 // Component functions
-void Entity::CreateSprite(sf::Texture* texture)
+void Entity::CreateMovementComponent(float maxVelocity, float acceleration, float deceleration)
 {
-	this->texture = texture;
-	this->sprite = new sf::Sprite(*this->texture);
-}
-
-void Entity::CreateMovementComponent(const float maxVelocity)
-{
-	this->movementComponent = new MovementComponent(maxVelocity);
+	this->movementComponent = new MovementComponent(this->sprite, maxVelocity, acceleration, deceleration);
 }
 
 // Functions
-void Entity::SetPosition(const float x, const float y)
+void Entity::SetPosition(float x, float y)
 {
-	if (!this->sprite)
-		return;
-
-	this->sprite->setPosition({ x, y });
+	this->sprite.setPosition({ x, y });
 }
 
-void Entity::Move(const float dirX, const float dirY, const float& dt)
+void Entity::Move(float dirX, float dirY, float dt)
 {
-	if (!this->sprite || !this->movementComponent)
+	if (!this->movementComponent)
 		return;
 
-	this->movementComponent->move(dirX, dirY); // Sets velocity
-	this->sprite->move(this->movementComponent->getVelocity() * dt);
+
+	this->movementComponent->Move(dirX, dirY, dt); // Sets velocity
+	std::cout << "Velocity: (" << this->movementComponent->GetVelocity().x << ", " << this->movementComponent->GetVelocity().y << ")\n";
 }
 
-void Entity::Update(const float& dt)
+void Entity::Update(float dt)
 {
+	if (!this->movementComponent)
+		return;
+
+	this->movementComponent->Update(dt);
 }
 
 void Entity::Render(sf::RenderTarget* target)
 {
-	if (!this->sprite)
-		return;
-
-	target->draw(*this->sprite);
+	target->draw(this->sprite);
 }

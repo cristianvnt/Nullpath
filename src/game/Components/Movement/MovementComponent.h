@@ -19,23 +19,26 @@
 class MovementComponent
 {
 private:
+	sf::Sprite& sprite;
+
 	float maxVelocity;
+	float acceleration;
+	float deceleration;
+
 	sf::Vector2f velocity;
-	sf::Vector2f acceleration;
-	sf::Vector2f deceleration;
 
 	// Init functions
 
 public:
-	MovementComponent(const float maxVelocity);
+	MovementComponent(sf::Sprite& sprite, float maxVelocity, float acceleration, float deceleration);
 	virtual ~MovementComponent();
 
 	// Accessors
-	const sf::Vector2f& getVelocity() const;
+	const sf::Vector2f& GetVelocity() const;
 
 	// Functions
-	void move(const float dirX, const float dirY);
-	void update(const float& dt);
+	void Move(float dirX, float dirY, float dt);
+	void Update(float dt);
 };
 
 #endif

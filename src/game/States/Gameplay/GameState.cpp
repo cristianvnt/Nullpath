@@ -41,10 +41,10 @@ void GameState::InitTextures()
 
 void GameState::InitPlayers()
 {
-	this->player = new Player(0.f, 0.f, &this->textures["PLAYER_IDLE"]);
+	this->player = new Player(0.f, 0.f, this->textures["PLAYER_IDLE"]);
 }
 
-void GameState::UpdateInput(const float& dt)
+void GameState::UpdateInput(float dt)
 {
 	if (sf::Keyboard::isKeyPressed(this->keybinds["MOVE_LEFT"]))
 	{
@@ -68,7 +68,7 @@ void GameState::UpdateInput(const float& dt)
 	}
 }
 
-void GameState::Update(const float& dt)
+void GameState::Update(float dt)
 {
 	this->UpdateMousePositions();
 	this->UpdateInput(dt);

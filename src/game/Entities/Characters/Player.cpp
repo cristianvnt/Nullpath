@@ -1,12 +1,11 @@
 #include "Player.h"
 
-Player::Player(const float x, const float y, sf::Texture* texture)
+Player::Player(float x, float y, sf::Texture& texture)
+	: Entity(texture)
 {
 	this->InitVariables();
-	this->InitComponents();
-
-	this->CreateSprite(texture);
 	this->SetPosition(x, y);
+	this->InitComponents();
 }
 
 Player::~Player()
@@ -20,5 +19,5 @@ void Player::InitVariables()
 
 void Player::InitComponents()
 {
-	this->CreateMovementComponent(120.f);
+	this->CreateMovementComponent(200.f, 50.f, 30.f);
 }

@@ -13,10 +13,10 @@ private:
 	void InitComponents();
 
 public:
-	Player(const float x, const float y, sf::Texture* texture);
-	virtual ~Player();
+	Player(float x, float y, sf::Texture& texture);
+	~Player();
 
 	// Functions
 };
 
-#endif PLAYER_H
+#endif
