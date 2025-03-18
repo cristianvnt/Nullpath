@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Abyssal-Fracture LANGUAGES CXX)
+project(Nullpath LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -29,20 +29,20 @@ file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/**/*.cpp")
 file(COPY ${CMAKE_SOURCE_DIR}/src/Config DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 file(COPY ${CMAKE_SOURCE_DIR}/src/Resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-add_executable(AbyssalFracture ${SOURCES})
+add_executable(Nullpath ${SOURCES})
 
-target_include_directories(AbyssalFracture PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(Nullpath PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-target_link_libraries(AbyssalFracture PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
+target_link_libraries(Nullpath PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
 
 # Build type-specific settings
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Debug mode with MSVC")
-        target_compile_options(AbyssalFracture PRIVATE /Zi /Od)
-        target_link_options(AbyssalFracture PRIVATE /DEBUG /INCREMENTAL)
+        target_compile_options(Nullpath PRIVATE /Zi /Od)
+        target_link_options(Nullpath PRIVATE /DEBUG /INCREMENTAL)
     elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
         message(STATUS "Release mode with MSVC")
-        target_compile_options(AbyssalFracture PRIVATE /O2)
+        target_compile_options(Nullpath PRIVATE /O2)
     endif()
 endif()
