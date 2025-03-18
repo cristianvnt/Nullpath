@@ -33,7 +33,6 @@ void Entity::Move(float dirX, float dirY, float dt)
 	if (!this->movementComponent)
 		return;
 
-
 	this->movementComponent->Move(dirX, dirY, dt); // Sets velocity
 	std::cout << "Velocity: (" << this->movementComponent->GetVelocity().x << ", " << this->movementComponent->GetVelocity().y << ")\n";
 }
