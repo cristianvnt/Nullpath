@@ -1,7 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "Components/Movement/MovementComponent.h"
+#include "Components/MovementComponent.h"
 
 class Entity
 {

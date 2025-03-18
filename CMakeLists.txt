@@ -24,14 +24,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SFML)
 
-file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/game/**/*.cpp")
+file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/**/*.cpp")
 
-file(COPY ${CMAKE_SOURCE_DIR}/src/game/Config DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-file(COPY ${CMAKE_SOURCE_DIR}/src/game/Resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+file(COPY ${CMAKE_SOURCE_DIR}/src/Config DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+file(COPY ${CMAKE_SOURCE_DIR}/src/Resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 add_executable(AbyssalFracture ${SOURCES})
 
-target_include_directories(AbyssalFracture PRIVATE ${CMAKE_SOURCE_DIR}/src/game)
+target_include_directories(AbyssalFracture PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 target_link_libraries(AbyssalFracture PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
 

@@ -1,7 +1,7 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
-#include "States/Base/State.h"
+#include "State.h"
 
 class GameState : public State
 {

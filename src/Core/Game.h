@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "States/Menu/MainMenuState.h"
+#include "MainMenuState.h"
 
 class Game
 {
