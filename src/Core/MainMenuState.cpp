@@ -27,9 +27,9 @@ void MainMenuState::InitBackground()
 		static_cast<float>(this->window->getSize().y)
 		});
 
-	if (!this->backgroundTexture.loadFromFile("Resources/Textures/Backgrounds/mainMenuBG.png"))
+	if (!this->backgroundTexture.loadFromFile("Resources/Textures/background.png"))
 	{
-		std::cerr << "Error: failed to load texture mainMenuBG.png\n";
+		std::cerr << "Error: failed to load texture background.png\n";
 		return;
 	}
 

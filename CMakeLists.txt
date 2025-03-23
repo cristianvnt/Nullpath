@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+﻿cmake_minimum_required(VERSION 3.28)
 
 project(Nullpath LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
@@ -30,7 +30,6 @@ file(COPY ${CMAKE_SOURCE_DIR}/src/Config DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRE
 file(COPY ${CMAKE_SOURCE_DIR}/src/Resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 add_executable(Nullpath ${SOURCES})
-
 target_include_directories(Nullpath PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 target_link_libraries(Nullpath PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)

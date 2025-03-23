@@ -13,6 +13,10 @@ State::~State()
 
 }
 
+void State::InitKeybinds()
+{
+}
+
 const bool& State::GetQuit() const
 {
 	return this->quit;
@@ -28,4 +32,8 @@ void State::UpdateMousePositions()
 	this->mousePosScreen = sf::Mouse::getPosition();
 	this->mousePosWindow = sf::Mouse::getPosition(*this->window);
 	this->mousePosView = this->window->mapPixelToCoords(sf::Mouse::getPosition(*this->window));
+}
+
+void State::UpdateInput(float dt)
+{
 }

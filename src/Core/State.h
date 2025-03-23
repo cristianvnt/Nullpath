@@ -2,6 +2,11 @@
 #define STATE_H
 
 #include "Entities/Player.h"
+#include <map>
+#include <stack>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 class State
 {
@@ -22,7 +27,7 @@ protected:
 	std::map<std::string, sf::Texture> textures;
 
 	// Functions
-	virtual void InitKeybinds() = 0;
+	virtual void InitKeybinds();
 
 public:
 	State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states);
@@ -32,7 +37,7 @@ public:
 	void EndState();
 
 	virtual void UpdateMousePositions();
-	virtual void UpdateInput(float dt) = 0;
+	virtual void UpdateInput(float dt);
 	virtual void Update(float dt) = 0;
 	virtual void Render(sf::RenderTarget* target = nullptr) = 0;
 };

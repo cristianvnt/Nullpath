@@ -1,22 +1,33 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "Entity.h"
+#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <fstream>
+#include <iostream>
 
-class Player : public Entity
+class Player
 {
 private:
-	// Vars
+	float posX, posY;
+	float angle;
 
-	// Init Functions
-	void InitVariables();
-	void InitComponents();
+	float moveSpeed;
+	float rotateSpeed;
+
+	void LoadFromConfig();
 
 public:
-	Player(float x, float y, sf::Texture& texture);
-	~Player();
+	Player();
 
-	// Functions
+	void Update(float dt);
+	void UpdateMovement(float dt);
+	void Render(sf::RenderTarget* target);
+
+	float GetX() const;
+	float GetY() const;
+	float GetAngle() const;
+
 };
 
 #endif
