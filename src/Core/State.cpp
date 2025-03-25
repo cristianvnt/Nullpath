@@ -1,9 +1,9 @@
 #include "State.h"
 
-State::State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states)
+State::State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states)
 {
 	this->window = window;
-	this->supportedKeys = supportedKeys;
+	this->keybinds = keybinds;
 	this->states = states;
 	this->quit = false;
 }
@@ -34,6 +34,6 @@ void State::UpdateMousePositions()
 	this->mousePosView = this->window->mapPixelToCoords(sf::Mouse::getPosition(*this->window));
 }
 
-void State::UpdateInput(float dt)
+void State::UpdateInput()
 {
 }

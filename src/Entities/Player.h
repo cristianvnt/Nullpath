@@ -5,6 +5,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <functional>
 
 class Player
 {
@@ -20,8 +21,8 @@ private:
 public:
 	Player();
 
-	void Update(float dt);
-	void UpdateMovement(float dt);
+	void Update(float dt, std::function<int(int, int)>genTileFn);
+	void UpdateMovement(float dt, std::function<int(int, int)>genTileFn);
 	void Render(sf::RenderTarget* target);
 
 	float GetX() const;

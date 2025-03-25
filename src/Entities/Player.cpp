@@ -31,41 +31,50 @@ void Player::LoadFromConfig()
 	ifs.close();
 }
 
-void Player::Update(float dt)
+void Player::Update(float dt, std::function<int(int, int)>genTileFn)
 {
-	this->UpdateMovement(dt);
+	this->UpdateMovement(dt, genTileFn);
 	
 	// DEBUG
 	std::cout << "Pos: (" << this->posX << ", " << this->posY << ") Angle: " << this->angle << "\n";
 }
 
-void Player::UpdateMovement(float dt)
+void Player::UpdateMovement(float dt, std::function<int(int, int)>genTileFn)
 {
+	float nextX = this->posX;
+	float nextY = this->posY;
+
 	// Move forward
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
 	{
-		this->posX += cos(this->angle) * moveSpeed * dt;
-		this->posY += sin(this->angle) * moveSpeed * dt;
+		nextX += cos(this->angle) * this->moveSpeed * dt;
+		nextY += sin(this->angle) * this->moveSpeed * dt;
 	}
 
 	// Move backward
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
 	{
-		this->posX -= cos(this->angle) * moveSpeed * dt;
-		this->posY -= sin(this->angle) * moveSpeed * dt;
+		nextX -= cos(this->angle) * this->moveSpeed * dt;
+		nextY -= sin(this->angle) * this->moveSpeed * dt;
+	}
+
+	// Checking collision
+	int tileX = static_cast<int>(nextX) / 32;
+	int tileY = static_cast<int>(nextY) / 32;
+
+	if (genTileFn(tileX, tileY) == 0)
+	{
+		this->posX = nextX;
+		this->posY = nextY;
 	}
 
 	// Rotate left
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-	{
 		this->angle -= rotateSpeed * dt;
-	}
 
 	// Rotate right
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-	{
 		this->angle += rotateSpeed * dt;
-	}
 
 }
 

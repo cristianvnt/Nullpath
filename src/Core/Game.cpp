@@ -3,7 +3,7 @@
 Game::Game()
 {
 	this->InitWindow();
-	this->InitKeys();
+	this->InitKeybinds();
 	this->InitStates();
 }
 
@@ -68,30 +68,33 @@ void Game::InitWindow()
 	this->window->setVerticalSyncEnabled(verticalSyncEnabled);
 }
 
-void Game::InitKeys()
+void Game::InitKeybinds()
 {
-	std::ifstream ifs("Config/supportedKeys.ini");
-
+	std::ifstream ifs("Config/keybinds.ini");
 	if (!ifs.is_open())
 	{
-		std::cerr << "Error: supported_keys.ini could not be opened.\n";
+		std::cerr << "Error: keybinds.ini could not be opened.\n";
 		return;
 	}
 
-	std::string key;
-	int key_value = 0;
+	std::string fnc, keyStr;
+	while (ifs >> fnc >> keyStr)
+	{
+		sf::Keyboard::Key keyCode = sf::Keyboard::Key::Unknown;
+		if (keyStr == "Escape") 
+			keyCode = sf::Keyboard::Key::Escape;
+		else if (keyStr == "Enter") 
+			keyCode = sf::Keyboard::Key::Enter;
 
-	while (ifs >> key >> key_value)
-		this->supportedKeys[key] = static_cast<sf::Keyboard::Key>(key_value);
+		this->keybinds[fnc] = keyCode;
+	}
 
-	// DEBUG
-	for (auto& i : this->supportedKeys)
-		std::cout << i.first << " " << static_cast<int>(i.second) << "\n";
+	ifs.close();
 }
 
 void Game::InitStates()
 {
-	this->states.push(new MainMenuState(this->window, &this->supportedKeys, &this->states));
+	this->states.push(new MainMenuState(this->window, &this->keybinds, &this->states));
 }
 
 void Game::EndApplication()

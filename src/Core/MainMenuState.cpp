@@ -1,7 +1,7 @@
-#include "MainMenuState.h"
+﻿#include "MainMenuState.h"
 
-MainMenuState::MainMenuState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states)
-	: State(window, supportedKeys, states)
+MainMenuState::MainMenuState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states)
+	: State(window, keybinds, states)
 {
 	this->InitVariables();
 	this->InitBackground();
@@ -47,22 +47,29 @@ void MainMenuState::InitFonts()
 
 void MainMenuState::InitKeybinds()
 {
-	std::ifstream ifs("Config/mainMenuKeybinds.ini");
+	std::ifstream ifs("Config/keybinds.ini");
 
 	if (!ifs.is_open())
 	{
-		std::cerr << "Error: gameStateKeybinds.ini could not be opened.\n";
+		std::cerr << "Error: keybinds.ini could not be opened.\n";
 		return;
 	}
 
-	if (ifs)
-	{
-		std::string fnc;
-		std::string keyStr;
+	std::string fnc, keyStr;
 
-		while (ifs >> fnc >> keyStr)
-			this->keybinds[fnc] = this->supportedKeys->at(keyStr);
+	while (ifs >> fnc >> keyStr)
+	{
+		sf::Keyboard::Key keyCode = sf::Keyboard::Key::Unknown;
+
+		if (keyStr == "Escape") 
+			keyCode = sf::Keyboard::Key::Escape;
+		else if (keyStr == "Enter") 
+			keyCode = sf::Keyboard::Key::Enter;
+
+		(*this->keybinds)[fnc] = keyCode;
 	}
+
+	ifs.close();
 }
 
 void MainMenuState::InitButtons()
@@ -83,9 +90,17 @@ void MainMenuState::InitButtons()
 		sf::Color(50, 50, 50, 0), sf::Color(150, 150, 150, 0), sf::Color(30, 30, 30, 0));
 }
 
-void MainMenuState::UpdateInput(float dt)
+void MainMenuState::UpdateInput()
 {
+	if (sf::Keyboard::isKeyPressed(this->keybinds->at("GAME_STATE")))
+	{
+		this->states->push(new GameState(this->window, this->keybinds, this->states));
+	}
 
+	if (sf::Keyboard::isKeyPressed(this->keybinds->at("MAINMENU_EXIT")))
+	{
+		this->EndState();
+	}
 }
 
 void MainMenuState::UpdateButtons()
@@ -96,7 +111,7 @@ void MainMenuState::UpdateButtons()
 	// New Game
 	if (this->buttons["GAME_STATE"]->isPressed())
 	{
-		this->states->push(new GameState(this->window, this->supportedKeys, this->states));
+		this->states->push(new GameState(this->window, this->keybinds, this->states));
 	}
 
 	// Quit
@@ -109,7 +124,7 @@ void MainMenuState::UpdateButtons()
 void MainMenuState::Update(float dt)
 {
 	this->UpdateMousePositions();
-	this->UpdateInput(dt);
+	this->UpdateInput();
 	this->UpdateButtons();
 }
 

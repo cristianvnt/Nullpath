@@ -16,12 +16,12 @@ private:
 
 	std::stack<State*> states;
 
-	std::map<std::string, sf::Keyboard::Key> supportedKeys;
+	std::map<std::string, sf::Keyboard::Key> keybinds;
 
 	void InitVariables();
 	void InitWindow();
 	void InitStates();
-	void InitKeys();
+	void InitKeybinds();
 
 public:
 	Game();

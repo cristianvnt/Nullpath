@@ -15,8 +15,7 @@ private:
 protected:
 	std::stack<State*>* states;
 	sf::RenderWindow* window;
-	std::map<std::string, sf::Keyboard::Key>* supportedKeys;
-	std::map<std::string, sf::Keyboard::Key> keybinds;
+	std::map<std::string, sf::Keyboard::Key>* keybinds;
 	bool quit;
 
 	sf::Vector2i mousePosScreen;
@@ -30,14 +29,14 @@ protected:
 	virtual void InitKeybinds();
 
 public:
-	State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states);
+	State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states);
 	virtual ~State();
 
 	const bool& GetQuit() const;
 	void EndState();
 
 	virtual void UpdateMousePositions();
-	virtual void UpdateInput(float dt);
+	virtual void UpdateInput();
 	virtual void Update(float dt) = 0;
 	virtual void Render(sf::RenderTarget* target = nullptr) = 0;
 };
