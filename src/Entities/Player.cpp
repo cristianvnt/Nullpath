@@ -58,15 +58,18 @@ void Player::UpdateMovement(float dt, std::function<int(int, int)>genTileFn)
 		nextY -= sin(this->angle) * this->moveSpeed * dt;
 	}
 
-	// Checking collision
+	// Checking collision and slide on collision
 	int tileX = static_cast<int>(nextX) / 32;
-	int tileY = static_cast<int>(nextY) / 32;
+	int tileY_current = static_cast<int>(this->posY) / 32;
 
-	if (genTileFn(tileX, tileY) == 0)
-	{
+	if (genTileFn(tileX, tileY_current) == 0)
 		this->posX = nextX;
+
+	int tileY = static_cast<int>(nextY) / 32;
+	int tileX_current = static_cast<int>(this->posX) / 32;
+
+	if (genTileFn(tileX_current, tileY) == 0)
 		this->posY = nextY;
-	}
 
 	// Rotate left
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
