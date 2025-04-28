@@ -1,9 +1,25 @@
 #include "Raycaster.h"
 
+void Raycaster::LoadTextures()
+{
+	LoadTexture(1, "Resources/Textures/brickwall.png");
+	LoadTexture(2, "Resources/Textures/stonewall.png");
+	LoadTexture(3, "Resources/Textures/woodwall.png");
+}
+
+void Raycaster::LoadTexture(int wallType, const std::string& texturePath)
+{
+	sf::Texture texture;
+	if (!texture.loadFromFile(texturePath))
+		std::cerr << "Failed to load texture: " << texturePath << "\n";
+	wallTextures[wallType] = std::move(texture);
+}
+
 Raycaster::Raycaster(int screenWidth, int screenHeight, const int* mapData, int mapWidth, int mapHeight, int tileSize)
 	: screenWidth(screenWidth), screenHeight(screenHeight), 
 	mapData(mapData), mapWidth(mapWidth), mapHeight(mapHeight), tileSize(tileSize)
 {
+	LoadTextures();
 }
 
 void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle)
@@ -13,46 +29,38 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 	const float rayAngleStep = fov / static_cast<float>(numRays);
 
 	// Floor and ceiling
-	sf::RectangleShape ceiling(sf::Vector2f(screenWidth, screenHeight / 2));
-	ceiling.setFillColor(sf::Color(100, 100, 100)); // Dark gray ceiling
-	ceiling.setPosition(sf::Vector2f(0, 0));
+	sf::RectangleShape ceiling({static_cast<float>(screenWidth), static_cast<float>(screenHeight) / 2.f});
+	ceiling.setFillColor(sf::Color(100, 100, 100));
 	target.draw(ceiling);
 
-	sf::RectangleShape floor(sf::Vector2f(screenWidth, screenHeight / 2));
-	floor.setFillColor(sf::Color(50, 50, 50)); // Darker gray floor
-	floor.setPosition(sf::Vector2f(0, screenHeight / 2));
+	sf::RectangleShape floor({static_cast<float>(screenWidth), static_cast<float>(screenHeight) / 2.f});
+	floor.setFillColor(sf::Color(50, 50, 50));
+	floor.setPosition({ 0.f, static_cast<float>(screenHeight) / 2.f });
 	target.draw(floor);
 
 	for (int ray = 0; ray < numRays; ray++)
 	{
+		// Compute ray angle relative to player direction
 		float rayAngle = playerAngle - fov / 2.f + ray * rayAngleStep;
 
 		// Normalize the angle
-		while (rayAngle < 0) 
-			rayAngle += 2 * Math::PI;
-		while (rayAngle >= 2 * Math::PI)
-			rayAngle -= 2 * Math::PI;
+		rayAngle = std::fmod(rayAngle + 2 * Math::PI, 2 * Math::PI);
 
 		float rayDirX = cos(rayAngle);
 		float rayDirY = sin(rayAngle);
 
-		// Current map position
+		// Current map cell of player
 		int mapX = static_cast<int>(playerX / tileSize);
 		int mapY = static_cast<int>(playerY / tileSize);
 
-		// Length of ray from current position to next x or y-side
-		float sideDistX;
-		float sideDistY;
+		// Distance to next x or y-side
+		float deltaDistX = (rayDirX == 0.f) ? 1e30f : std::abs(1.0f / rayDirX);
+		float deltaDistY = (rayDirY == 0.f) ? 1e30f : std::abs(1.0f / rayDirY);
 
-		// Length of ray from one x or y-side to next x or y-side
-		float deltaDistX = (rayDirX == 0) ? 1e30f : std::abs(1.0f / rayDirX);
-		float deltaDistY = (rayDirY == 0) ? 1e30f : std::abs(1.0f / rayDirY);
+		float sideDistX, sideDistY;
+		int stepX, stepY;
 
-		// What direction to step in x or y-direction (either +1 or -1)
-		int stepX;
-		int stepY;
-
-		// Calc step and initial sideDist
+		// Calculate step and initial sideDist
 		if (rayDirX < 0)
 		{
 			stepX = -1;
@@ -75,10 +83,11 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 			sideDistY = (mapY + 1.0f - (playerY / tileSize)) * deltaDistY;
 		}
 
-		// DDA
+		// DDA: perform grid traversal to find wall hit
 		bool hit = false;
-		int side = 0; // NS or a EW wall hit?
+		int side = 0; // NS or a EW wall hit
 		float perpWallDist;
+		int wallType = 0;
 
 		while (!hit)
 		{
@@ -96,7 +105,7 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 				side = 1;
 			}
 
-			// Check if ray hit a wall
+			// Check for out-of-bound or wall hit
 			if (mapX < 0 || mapX >= mapWidth || mapY < 0 || mapY >= mapHeight)
 			{
 				// Ray is out of bounds
@@ -105,45 +114,42 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 			}
 			else if (mapData[mapY * mapWidth + mapX] > 0)
 			{
+				wallType = mapData[mapY * mapWidth + mapX];
 				hit = true;
 			}
 		}
 
-		// Calc distance projected on camera direction
+		// Calculate perpendicular distance and apply fish-eye correction
 		if (side == 0)
 			perpWallDist = (sideDistX - deltaDistX);
 		else
 			perpWallDist = (sideDistY - deltaDistY);
-
-		// Adjust for fisheye effect
 		perpWallDist *= cos(playerAngle - rayAngle);
 
+		// Determine line height on screen
 		int lineHeight = static_cast<int>(screenHeight / perpWallDist);
+		int drawStart = std::max(0, screenHeight / 2 - lineHeight / 2);
+		int drawEnd = std::max(screenHeight - 1, screenHeight / 2 + lineHeight / 2);
 
+		// UV mapping: calculate exact hit position on wall
+		float wallX;
+		if (side == 0)
+			wallX = playerY / tileSize + perpWallDist * rayDirY;
+		else
+			wallX = playerX / tileSize + perpWallDist * rayDirX;
+		wallX -= std::floor(wallX);
 
-		// Calc lowest and highest pixel to fill in current stripe
-		int drawStart = screenHeight / 2 - lineHeight / 2;
-		if (drawStart < 0) 
-			drawStart = 0;
+		int texX = int(wallX * textureSize);
+		if ((side == 0 && rayDirX > 0) || (side == 1 && rayDirY < 0))
+			texX = textureSize - texX - 1;
 
-		int drawEnd = screenHeight / 2 + lineHeight / 2;
-		if (drawEnd >= screenHeight) 
-			drawEnd = screenHeight - 1;
+		// Draw texture
+		sf::RectangleShape slice(sf::Vector2f(1.f, static_cast<float>(drawEnd - drawStart)));
+		slice.setPosition(sf::Vector2f(static_cast<float>(ray), static_cast<float>(drawStart)));
 
-		// Wall color based on side (for shading effect)
-		sf::Color wallColor = sf::Color::White;
-		if (side == 1)
-		{
-			// Darker shade for y-side walls
-			wallColor = sf::Color(200, 200, 200);
-		}
-
-		sf::Vertex line[2];
-		line[0].position = sf::Vector2f(static_cast<float>(ray), static_cast<float>(drawStart));
-		line[0].color = wallColor;
-		line[1].position = sf::Vector2f(static_cast<float>(ray), static_cast<float>(drawEnd));
-		line[1].color = wallColor;
-
-		target.draw(line, 2, sf::PrimitiveType::Lines);
+		int texId = wallTextures.count(wallType) ? wallType : 1;
+		slice.setTexture(&wallTextures[texId]);
+		slice.setTextureRect(sf::IntRect(sf::Vector2i(texX, 0), sf::Vector2i(1, textureSize)));
+		target.draw(slice);
 	}
 }

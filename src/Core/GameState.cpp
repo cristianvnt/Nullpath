@@ -22,7 +22,7 @@ void GameState::InitPlayers()
 	int tileY = static_cast<int>(this->player->GetY()) / this->tileSize;
 
 	if (tileX < 0 || tileX >= this->mapWidth || tileY < 0 || tileY >= this->mapHeight)
-		std::cerr << "Error: Player starting pos outide the map!\n";
+		std::cerr << "Error: Player starting pos outside the map!\n";
 	else if (this->GetTile(tileX, tileY) != 0)
 		std::cerr << "Error: Player starting pos is on a wall tiles! (tile value: " << this->mapData[tileY * this->mapWidth + tileX] << " )\n";
 }
@@ -35,16 +35,16 @@ void GameState::InitRaycaster()
 
 	const int staticMap[] = 
 	{
-			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-			1, 0, 1, 0, 1, 0, 1, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-			1, 0, 1, 1, 1, 1, 1, 1, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-			1, 0, 1, 1, 1, 1, 1, 1, 0, 1,
-			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 2, 0, 2, 0, 3, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 3, 0, 0, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 2, 2, 2, 2, 2, 2, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 3, 3, 3, 3, 3, 3, 0, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	};
 
 	this->mapData = new int[mapWidth * mapHeight];

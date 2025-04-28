@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <Core/Constants.h>
+#include <map>
 
 class Raycaster
 {
@@ -16,10 +17,17 @@ private:
 
 	const int* mapData;
 
+	std::map<int, sf::Texture> wallTextures;
+	const int textureSize = 64;
+
+	// Helper func
+	void LoadTextures();
+
 public:
 	Raycaster(int screenWidth, int screenHeight, const int* mapData, int mapWidth, int mapHeight, int tileSize);
 
 	void Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle);
+	void LoadTexture(int wallType, const std::string& texturePath);
 };
 
 #endif
