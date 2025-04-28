@@ -12,6 +12,10 @@ void Raycaster::LoadTexture(int wallType, const std::string& texturePath)
 	sf::Texture texture;
 	if (!texture.loadFromFile(texturePath))
 		std::cerr << "Failed to load texture: " << texturePath << "\n";
+
+	texture.setRepeated(true);
+	texture.setSmooth(false);
+
 	wallTextures[wallType] = std::move(texture);
 }
 
@@ -37,6 +41,14 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 	floor.setFillColor(sf::Color(50, 50, 50));
 	floor.setPosition({ 0.f, static_cast<float>(screenHeight) / 2.f });
 	target.draw(floor);
+
+	// Create a separate vertex array for each texture
+	std::map<int, sf::VertexArray> texturedWalls;
+
+	// Initialize vertex arrays for each texture
+	for (const auto& pair : wallTextures) {
+		texturedWalls[pair.first] = sf::VertexArray(sf::PrimitiveType::Triangles);
+	}
 
 	for (int ray = 0; ray < numRays; ray++)
 	{
@@ -119,37 +131,66 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 			}
 		}
 
-		// Calculate perpendicular distance and apply fish-eye correction
+		// Calculate raw perpendicular distance and apply fish-eye correction
+		float rawDist;
 		if (side == 0)
-			perpWallDist = (sideDistX - deltaDistX);
+			rawDist = (sideDistX - deltaDistX);
 		else
-			perpWallDist = (sideDistY - deltaDistY);
-		perpWallDist *= cos(playerAngle - rayAngle);
+			rawDist = (sideDistY - deltaDistY);
+		perpWallDist = rawDist * cos(playerAngle - rayAngle);
 
 		// Determine line height on screen
 		int lineHeight = static_cast<int>(screenHeight / perpWallDist);
 		int drawStart = std::max(0, screenHeight / 2 - lineHeight / 2);
-		int drawEnd = std::max(screenHeight - 1, screenHeight / 2 + lineHeight / 2);
+		int drawEnd = std::min(screenHeight - 1, screenHeight / 2 + lineHeight / 2);
 
 		// UV mapping: calculate exact hit position on wall
 		float wallX;
 		if (side == 0)
-			wallX = playerY / tileSize + perpWallDist * rayDirY;
+			wallX = playerY / tileSize + rawDist * rayDirY;
 		else
-			wallX = playerX / tileSize + perpWallDist * rayDirX;
+			wallX = playerX / tileSize + rawDist * rayDirX;
 		wallX -= std::floor(wallX);
 
 		int texX = int(wallX * textureSize);
 		if ((side == 0 && rayDirX > 0) || (side == 1 && rayDirY < 0))
 			texX = textureSize - texX - 1;
 
-		// Draw texture
-		sf::RectangleShape slice(sf::Vector2f(1.f, static_cast<float>(drawEnd - drawStart)));
-		slice.setPosition(sf::Vector2f(static_cast<float>(ray), static_cast<float>(drawStart)));
-
+		// Select texture
 		int texId = wallTextures.count(wallType) ? wallType : 1;
-		slice.setTexture(&wallTextures[texId]);
-		slice.setTextureRect(sf::IntRect(sf::Vector2i(texX, 0), sf::Vector2i(1, textureSize)));
-		target.draw(slice);
+		const sf::Texture& tex = wallTextures[texId];
+		sf::Vector2f texSize = static_cast<sf::Vector2f>(tex.getSize());
+
+		// Calculate texture coordinates
+		float u0 = float(texX);
+		float u1 = float(texX + 1);
+
+		// Apply slight darkening to side walls for better depth perception
+		sf::Color wallColor = (side == 1) ? sf::Color(180, 180, 180) : sf::Color::White;
+
+		// Get the vertex array for this texture
+		sf::VertexArray& currentWalls = texturedWalls[texId];
+
+		// Triangle 1: top-left, top-right, bottom-right
+		currentWalls.append(sf::Vertex{ { float(ray), float(drawStart) }, wallColor, { u0, 0.f } });
+		currentWalls.append(sf::Vertex{ { float(ray + 1), float(drawStart) }, wallColor, { u1, 0.f } });
+		currentWalls.append(sf::Vertex{ { float(ray + 1), float(drawEnd) }, wallColor, { u1, textureSize } });
+
+		// Triangle 2: bottom-right, bottom-left, top-left
+		currentWalls.append(sf::Vertex{ { float(ray + 1), float(drawEnd) }, wallColor, { u1, textureSize } });
+		currentWalls.append(sf::Vertex{ { float(ray), float(drawEnd) }, wallColor, { u0, textureSize } });
+		currentWalls.append(sf::Vertex{ { float(ray), float(drawStart) }, wallColor, { u0, 0.f } });
+
+	}
+
+	// Draw each textured wall group separately
+	for (const auto& pair : texturedWalls) {
+		// Skip empty vertex arrays
+		if (pair.second.getVertexCount() == 0)
+			continue;
+
+		sf::RenderStates states;
+		states.texture = &wallTextures[pair.first];
+		target.draw(pair.second, states);
 	}
 }
