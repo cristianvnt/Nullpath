@@ -64,6 +64,7 @@ void Game::InitWindow()
 		this->window = new sf::RenderWindow(windowBounds, title, sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize, 
 			sf::State::Windowed, this->windowSettings);
 
+	this->window->setKeyRepeatEnabled(false);
 	this->window->setFramerateLimit(framerateLimit);
 	this->window->setVerticalSyncEnabled(verticalSyncEnabled);
 }
@@ -110,10 +111,15 @@ void Game::UpdateDt()
 
 void Game::UpdateEvents()
 {
-	while (const std::optional event = this->window->pollEvent())
+	std::optional<sf::Event> eventOpt;
+	while (eventOpt = window->pollEvent())
 	{
-		if (event->is<sf::Event::Closed>())
-			this->window->close();
+		auto& event = *eventOpt;
+		if (event.is<sf::Event::Closed>())
+			window->close();
+
+		if (auto keyEvent = event.getIf<sf::Event::KeyPressed>())
+			states.top()->HandleKey(keyEvent->code);
 	}
 }
 
@@ -123,12 +129,12 @@ void Game::Update()
 
 	if (!this->states.empty())
 	{
-		this->states.top()->Update(this->dt);
+		auto top = this->states.top();
+		top->Update(this->dt);
 
-		if (this->states.top()->GetQuit())
+		if (top->GetQuit())
 		{
-			this->states.top()->EndState();
-			delete this->states.top();
+			delete top;
 			this->states.pop();
 		}
 	}

@@ -25,9 +25,11 @@ public:
 	MainMenuState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* supportedKeys, std::stack<State*>* states);
 	virtual ~MainMenuState();
 
-	void UpdateInput() override;
+	void HandleKey(sf::Keyboard::Key code) override;
+
 	void UpdateButtons();
 	void Update(float dt) override;
+
 	void RenderButtons(sf::RenderTarget* target = nullptr);
 	void Render(sf::RenderTarget* target = nullptr) override;
 };

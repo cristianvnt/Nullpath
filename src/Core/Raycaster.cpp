@@ -140,8 +140,8 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 
 		// Determine line height on screen
 		int lineHeight = static_cast<int>(screenHeight / perpWallDist);
-		int drawStart = std::max(0, screenHeight / 2 - lineHeight / 2);
-		int drawEnd = std::min(screenHeight - 1, screenHeight / 2 + lineHeight / 2);
+		float drawStart = screenHeight / 2.f - lineHeight / 2.f;
+		float drawEnd = screenHeight / 2.f + lineHeight / 2.f;
 
 		// UV mapping: calculate exact hit position on wall
 		float wallX;

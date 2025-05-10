@@ -35,6 +35,8 @@ public:
 	const bool& GetQuit() const;
 	void EndState();
 
+	virtual void HandleKey(sf::Keyboard::Key code) = 0;
+
 	virtual void UpdateMousePositions();
 	virtual void UpdateInput();
 	virtual void Update(float dt) = 0;

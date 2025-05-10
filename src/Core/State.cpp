@@ -10,7 +10,6 @@ State::State(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>*
 
 State::~State()
 {
-
 }
 
 void State::InitKeybinds()

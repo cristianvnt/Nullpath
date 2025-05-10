@@ -23,18 +23,21 @@ private:
 	// RNG engine for maze generation and random placements
 	std::mt19937 rng;
 
-	// DFS based maze generation methods
-	void generateMazeDFS();
-	void carveDFS(int x, int y);
-
 	void InitRaycaster();
+
+	// DFS based maze generation methods
+	void GenerateMazeDFS();
+	void CarveDFS(int x, int y);
+
+	void RenderMiniMap(sf::RenderTarget& target);
 
 public:
 	GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states);
 	virtual ~GameState();
 
+	void HandleKey(sf::Keyboard::Key code) override;
+
 	void Update(float dt) override;
-	void UpdateInput() override;
 	void Render(sf::RenderTarget* target = nullptr) override;
 
 	int GetTile(int x, int y) const;

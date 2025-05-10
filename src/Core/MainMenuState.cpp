@@ -90,16 +90,17 @@ void MainMenuState::InitButtons()
 		sf::Color(50, 50, 50, 0), sf::Color(150, 150, 150, 0), sf::Color(30, 30, 30, 0));
 }
 
-void MainMenuState::UpdateInput()
+void MainMenuState::HandleKey(sf::Keyboard::Key code)
 {
-	if (sf::Keyboard::isKeyPressed(this->keybinds->at("GAME_STATE")))
+	if (code == keybinds->at("GAME_STATE"))
 	{
 		this->states->push(new GameState(this->window, this->keybinds, this->states));
 	}
 
-	if (sf::Keyboard::isKeyPressed(this->keybinds->at("MAINMENU_EXIT")))
+	if (code == keybinds->at("MAINMENU_EXIT"))
 	{
-		this->EndState();
+		window->close();
+		return;
 	}
 }
 
