@@ -3,6 +3,10 @@
 
 #include "State.h"
 #include "Raycaster.h"
+#include "Entities/Player.h"
+
+#include <vector>
+#include <random>
 
 class GameState : public State
 {
@@ -10,10 +14,14 @@ private:
 	Player* player;
 	Raycaster* raycaster;
 
-	int mapWidth;
-	int mapHeight;
-	int tileSize;
+	int mapWidth, mapHeight, tileSize;
 	int* mapData;
+
+	std::vector<bool> visited;
+	std::mt19937 rng{ std::random_device{}() };
+
+	void generateMazeDFS();
+	void carveDFS(int x, int y);
 
 	void InitPlayers();
 	void InitRaycaster();
