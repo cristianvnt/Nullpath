@@ -2,8 +2,8 @@
 #define RAYCASTER_H
 
 #include <SFML/Graphics.hpp>
-#include <vector>
 #include <Core/Constants.h>
+#include <vector>
 #include <map>
 
 struct RayHit
