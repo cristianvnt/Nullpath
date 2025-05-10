@@ -14,16 +14,19 @@ private:
 	Player* player;
 	Raycaster* raycaster;
 
-	int mapWidth, mapHeight, tileSize;
+	int mapWidth;
+	int mapHeight;
+	int tileSize;
 	int* mapData;
 
 	std::vector<bool> visited;
-	std::mt19937 rng{ std::random_device{}() };
+	// RNG engine for maze generation and random placements
+	std::mt19937 rng;
 
+	// DFS based maze generation methods
 	void generateMazeDFS();
 	void carveDFS(int x, int y);
 
-	void InitPlayers();
 	void InitRaycaster();
 
 public:

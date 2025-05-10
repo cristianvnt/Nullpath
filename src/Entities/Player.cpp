@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player()
-	: posX(100.f), posY(100.f), angle(0.f), moveSpeed(100.f), rotateSpeed(1.5f)
+	: posX(0.f), posY(0.f), angle(0.f), moveSpeed(100.f), rotateSpeed(1.5f)
 {
 	this->LoadFromConfig();
 }
@@ -18,11 +18,7 @@ void Player::LoadFromConfig()
 	std::string key;
 	while (ifs >> key)
 	{
-		if (key == "START_X")
-			ifs >> this->posX;
-		else if (key == "START_Y")
-			ifs >> this->posY;
-		else if (key == "MOVE_SPEED")
+		if (key == "MOVE_SPEED")
 			ifs >> this->moveSpeed;
 		else if (key == "ROTATE_SPEED")
 			ifs >> this->rotateSpeed;
@@ -31,10 +27,16 @@ void Player::LoadFromConfig()
 	ifs.close();
 }
 
-void Player::Update(float dt, std::function<int(int, int)>genTileFn)
+void Player::SetPosition(float x, float y)
+{
+	posX = x;
+	posY = y;
+}
+
+void Player::Update(float dt, std::function<int(int, int)> genTileFn)
 {
 	this->UpdateMovement(dt, genTileFn);
-	
+
 	// DEBUG
 	std::cout << "Pos: (" << this->posX << ", " << this->posY << ") Angle: " << this->angle << "\n";
 }

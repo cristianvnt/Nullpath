@@ -123,6 +123,9 @@ void MainMenuState::UpdateButtons()
 
 void MainMenuState::Update(float dt)
 {
+	if (!window->hasFocus())
+		return;
+
 	this->UpdateMousePositions();
 	this->UpdateInput();
 	this->UpdateButtons();

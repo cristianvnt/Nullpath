@@ -20,7 +20,6 @@ private:
 	std::map<int, sf::Texture> wallTextures;
 	static const int textureSize = 64;
 
-	// Helper func
 	void LoadTextures();
 
 public:

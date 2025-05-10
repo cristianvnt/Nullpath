@@ -5,9 +5,16 @@
 #include <cstring>
 
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states)
-	: State(window, keybinds, states)
+	: State(window, keybinds, states),
+	player(new Player()),
+	raycaster(nullptr),
+	mapWidth(10),
+	mapHeight(10),
+	tileSize(32),
+	mapData(new int[mapWidth * mapHeight]),
+	visited(mapWidth * mapHeight, false),
+	rng(std::random_device{}())
 {
-	this->InitPlayers();
 	this->InitRaycaster();
 }
 
@@ -18,82 +25,25 @@ GameState::~GameState()
 	delete[] this->mapData;
 }
 
-void GameState::generateMazeDFS()
-{
-	for (int i = 0; i < mapWidth * mapHeight; i++)
-		mapData[i] = 1;
-
-	visited.assign(mapWidth * mapHeight, false);
-
-	int sx = static_cast<int>(player->GetX() / tileSize);
-	int sy = static_cast<int>(player->GetY() / tileSize);
-
-	carveDFS(sx, sy);
-}
-
-void GameState::carveDFS(int x, int y)
-{
-	int idx = y * mapWidth + x;
-	visited[idx] = true;
-	mapData[idx] = 0;
-
-	std::array<std::pair<int, int>, 4> dirs = {
-		std::make_pair(0, -1),
-		std::make_pair(1, 0),
-		std::make_pair(0, 1),
-		std::make_pair(-1, 0)
-	};
-
-	std::shuffle(dirs.begin(), dirs.end(), rng);
-
-	for (auto &[dx, dy] : dirs)
-	{
-		int nx = x + dx;
-		int ny = y + dy;
-
-		if (nx >= 1 && nx < mapWidth - 1 && ny >= 1 && ny < mapHeight - 1 && !visited[ny * mapWidth + nx])
-			carveDFS(nx, ny);
-	}
-}
-
-void GameState::InitPlayers()
-{
-	this->player = new Player();
-
-	int tileX = static_cast<int>(this->player->GetX()) / this->tileSize;
-	int tileY = static_cast<int>(this->player->GetY()) / this->tileSize;
-
-	if (tileX < 0 || tileX >= this->mapWidth || tileY < 0 || tileY >= this->mapHeight)
-		std::cerr << "Error: Player starting pos outside the map!\n";
-	else if (this->GetTile(tileX, tileY) != 0)
-		std::cerr << "Error: Player starting pos is on a wall tiles! (tile value: " << this->mapData[tileY * this->mapWidth + tileX] << " )\n";
-}
-
 void GameState::InitRaycaster()
 {
-	this->mapWidth = 10;
-	this->mapHeight = 10;
-	this->tileSize = 32;
-
-	const int staticMap[] = 
-	{
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 2, 0, 2, 0, 3, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 3, 0, 0, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 2, 2, 2, 2, 2, 2, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 3, 3, 3, 3, 3, 3, 0, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	};
-
-	this->mapData = new int[mapWidth * mapHeight];
-	std::memcpy(this->mapData, staticMap, sizeof(staticMap));
-
+	// Reset visited flags and generate new maze
 	visited.assign(mapWidth * mapHeight, false);
 	generateMazeDFS();
+
+	// Place player ona random empty cell (odd coords to ensure valid paths)
+	int px, py;
+	do
+	{
+		px = (rng() % (mapWidth / 2)) * 2 + 1;
+		py = (rng() % (mapHeight / 2)) * 2 + 1;
+	} while (mapData[py * mapWidth + px] != 0);
+
+	player->SetPosition(px * tileSize, py * tileSize);
+
+	// Reinit raycaster with the current map and player
+	if (raycaster)
+		delete raycaster;
 
 	this->raycaster = new Raycaster(
 		this->window->getSize().x,
@@ -105,13 +55,56 @@ void GameState::InitRaycaster()
 	);
 }
 
+void GameState::generateMazeDFS()
+{
+	// Fill entire grid with walls
+	std::fill(mapData, mapData + mapWidth * mapHeight, 1);
+	visited.assign(mapWidth * mapHeight, false);
+
+	// Start at random odd coords
+	int sx = (rng() % (mapWidth / 2)) * 2 + 1;
+	int sy = (rng() % (mapHeight / 2)) * 2 + 1;
+
+	carveDFS(sx, sy);
+}
+
+void GameState::carveDFS(int x, int y)
+{
+	int idx = y * mapWidth + x;
+	// Mark current cell as empty and visited
+	mapData[idx] = 0;
+	visited[idx] = true;
+
+	std::array<std::pair<int, int>, 4> dirs = {
+		std::make_pair(0, -1),
+		std::make_pair(1, 0),
+		std::make_pair(0, 1),
+		std::make_pair(-1, 0)
+	};
+	std::shuffle(dirs.begin(), dirs.end(), rng);
+
+	for (auto& [dx, dy] : dirs)
+	{
+		int nx = x + dx * 2;
+		int ny = y + dy * 2;
+
+		if (nx >= 1 && ny >= 1 && nx < mapWidth - 1 && ny < mapHeight - 1 && !visited[ny * mapWidth + nx])
+		{
+			// Remove walls between cells and recurse into next cell
+			mapData[(y + dy) * mapWidth + (x + dx)] = 0;
+			carveDFS(nx, ny);
+		}
+	}
+}
+
 void GameState::Update(float dt)
 {
+	if (!window->hasFocus())
+		return;
+
 	this->UpdateMousePositions();
 	this->UpdateInput();
-	this->player->Update(dt, [this](int x, int y) {
-		return this->GetTile(x, y);
-		});
+	this->player->Update(dt, [this](int x, int y) { return this->GetTile(x, y); });
 }
 
 void GameState::UpdateInput()
@@ -120,36 +113,13 @@ void GameState::UpdateInput()
 		this->EndState();
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
-		generateMazeDFS();
+		InitRaycaster();
 }
 
 void GameState::Render(sf::RenderTarget* target)
 {
 	if (!target)
 		target = this->window;
-
-	// Mini-map
-	float miniTile = tileSize * 0.25f;
-	sf::RectangleShape cell({ miniTile, miniTile });
-	const float margin = 10.f;
-	for (int y = 0; y < mapHeight; y++) 
-	{
-		for (int x = 0; x < mapWidth; x++) 
-		{
-			int v = mapData[y * mapWidth + x];
-			cell.setFillColor(v > 0 ? sf::Color(60, 60, 60) : sf::Color(180, 180, 180));
-			cell.setPosition({ margin + x * miniTile, margin + y * miniTile });
-			target->draw(cell);
-		}
-	}
-
-	// And its border
-	sf::RectangleShape border({ mapWidth * miniTile + 2.f, mapHeight * miniTile + 2.f });
-	border.setPosition({ margin - 1.f, margin - 1.f });
-	border.setFillColor(sf::Color::Transparent);
-	border.setOutlineColor(sf::Color::White);
-	border.setOutlineThickness(1.f);
-	target->draw(border);
 
 	// 2.5D render
 	this->raycaster->Render(
@@ -158,6 +128,29 @@ void GameState::Render(sf::RenderTarget* target)
 		this->player->GetY(),
 		this->player->GetAngle()
 	);
+
+	// Draw mini-map
+	float miniTile = tileSize * 0.5f;
+	sf::RectangleShape cell({ miniTile, miniTile });
+	const float margin = 10.f;
+	for (int y = 0; y < mapHeight; y++)
+	{
+		for (int x = 0; x < mapWidth; x++)
+		{
+			int v = mapData[y * mapWidth + x];
+			cell.setFillColor(v > 0 ? sf::Color(30, 60, 60) : sf::Color(180, 180, 180));
+			cell.setPosition({ margin + x * miniTile, margin + y * miniTile });
+			target->draw(cell);
+		}
+	}
+
+	// Draw border around
+	sf::RectangleShape border({ mapWidth * miniTile + 2.f, mapHeight * miniTile + 2.f });
+	border.setPosition({ margin - 1.f, margin - 1.f });
+	border.setFillColor(sf::Color::Transparent);
+	border.setOutlineColor(sf::Color::White);
+	border.setOutlineThickness(3.f);
+	target->draw(border);
 }
 
 int GameState::GetTile(int x, int y) const

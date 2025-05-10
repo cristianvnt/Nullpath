@@ -12,7 +12,6 @@ class Player
 private:
 	float posX, posY;
 	float angle;
-
 	float moveSpeed;
 	float rotateSpeed;
 
@@ -21,6 +20,8 @@ private:
 public:
 	Player();
 
+	void SetPosition(float x, float y);
+
 	void Update(float dt, std::function<int(int, int)>genTileFn);
 	void UpdateMovement(float dt, std::function<int(int, int)>genTileFn);
 	void Render(sf::RenderTarget* target);
@@ -28,7 +29,6 @@ public:
 	float GetX() const;
 	float GetY() const;
 	float GetAngle() const;
-
 };
 
 #endif
