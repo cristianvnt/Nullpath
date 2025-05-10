@@ -25,6 +25,86 @@ Raycaster::Raycaster(int screenWidth, int screenHeight, const int* mapData, int 
 	LoadTextures();
 }
 
+RayHit Raycaster::CastRay(float playerX, float playerY, float rayAngle)
+{
+	float rayDirX = cos(rayAngle);
+	float rayDirY = sin(rayAngle);
+
+	// Current map cell of player
+	int mapX = static_cast<int>(playerX / tileSize);
+	int mapY = static_cast<int>(playerY / tileSize);
+
+	// Distance to next x or y-side
+	float deltaDistX = (rayDirX == 0.f) ? 1e30f : std::abs(1.0f / rayDirX);
+	float deltaDistY = (rayDirY == 0.f) ? 1e30f : std::abs(1.0f / rayDirY);
+
+	float sideDistX, sideDistY;
+	int stepX, stepY;
+
+	// Calculate step and initial sideDist
+	if (rayDirX < 0)
+	{
+		stepX = -1;
+		sideDistX = ((playerX / tileSize) - mapX) * deltaDistX;
+	}
+	else
+	{
+		stepX = 1;
+		sideDistX = (mapX + 1.0f - (playerX / tileSize)) * deltaDistX;
+	}
+
+	if (rayDirY < 0)
+	{
+		stepY = -1;
+		sideDistY = ((playerY / tileSize) - mapY) * deltaDistY;
+	}
+	else
+	{
+		stepY = 1;
+		sideDistY = (mapY + 1.0f - (playerY / tileSize)) * deltaDistY;
+	}
+
+	// DDA loop
+	bool hit = false;
+	int side = 0;
+
+	while (!hit)
+	{
+		if (sideDistX < sideDistY)
+		{
+			sideDistX += deltaDistX;
+			mapX += stepX;
+			side = 0;
+		}
+		else
+		{
+			sideDistY += deltaDistY;
+			mapY += stepY;
+			side = 1;
+		}
+
+		if (mapX < 0 || mapX >= mapWidth || mapY < 0 || mapY >= mapHeight)
+			break;
+		else if (mapData[mapY * mapWidth + mapX] > 0)
+			hit = true;
+	}
+
+	// Calculate raw perpendicular distance
+	float rawDist;
+	if (side == 0)
+		rawDist = (sideDistX - deltaDistX);
+	else
+		rawDist = (sideDistY - deltaDistY);
+
+	float perpDistCells = rawDist;
+
+	float perpDistPixels = perpDistCells * tileSize;
+	float hitX = playerX + rayDirX * perpDistPixels;
+	float hitY = playerY + rayDirY * perpDistPixels;
+
+	return RayHit{ hitX, hitY, perpDistPixels };
+}
+
 void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle)
 {
 	const int numRays = screenWidth;

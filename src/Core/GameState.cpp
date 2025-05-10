@@ -57,8 +57,13 @@ void GameState::InitRaycaster()
 
 void GameState::GenerateMazeDFS()
 {
-	// Fill entire grid with walls
+	// Either way i guess
+	// Fill entire grid with wall types 1 or 1 2 and 3
 	std::fill(mapData, mapData + mapWidth * mapHeight, 1);
+	/*std::uniform_int_distribution<> wallDistrib(1, 6);
+	for (int i = 0; i < mapWidth * mapHeight; i++)
+		mapData[i] = wallDistrib(rng);*/
+
 	visited.assign(mapWidth * mapHeight, false);
 
 	// Start at random odd coords
@@ -159,6 +164,51 @@ void GameState::RenderMiniMap(sf::RenderTarget& target)
 	dot.setFillColor(sf::Color::Red);
 	dot.setPosition({ dotX, dotY });
 	target.draw(dot);
+
+	// Draw FOV
+	const float fov = 60.f * (Math::PI / 180.f);
+	float playerAngle = player->GetAngle();
+	
+	// Max distance until you hit the wall
+	float maxDist = 3.f;
+	float angL = playerAngle - fov / 2;
+	float angR = playerAngle + fov / 2;
+
+	auto hitL = raycaster->CastRay(worldX, worldY, angL);
+	auto hitR = raycaster->CastRay(worldX, worldY, angR);
+
+	sf::Vector2f dotPlayer{ dotX, dotY };
+	sf::Vector2f endPointL{
+		margin + (hitL.hitWorldX / tileSize) * miniTile,
+		margin + (hitL.hitWorldY / tileSize) * miniTile,
+	};
+
+	sf::Vector2f endPointR{
+		margin + (hitR.hitWorldX / tileSize) * miniTile,
+		margin + (hitR.hitWorldY / tileSize) * miniTile,
+	};
+
+	// Color the FOV
+	const int slices = 60;
+	sf::VertexArray fovFill(sf::PrimitiveType::TriangleFan, slices + 2);
+	fovFill[0].position = dotPlayer;
+	fovFill[0].color = sf::Color::Yellow;
+
+	for (int i = 0; i <= slices; i++)
+	{
+		float a = playerAngle - fov / 2 + (fov / slices) * i;
+		auto hit = raycaster->CastRay(worldX, worldY, a);
+
+		sf::Vector2f hitPoint {
+			margin + (hit.hitWorldX / tileSize) * miniTile,
+			margin + (hit.hitWorldY / tileSize) * miniTile,
+		};
+
+		fovFill[i + 1].position = hitPoint;
+		fovFill[i + 1].color = sf::Color::Yellow;
+	}
+
+	target.draw(fovFill);
 }
 
 void GameState::Render(sf::RenderTarget* target)

@@ -6,6 +6,13 @@
 #include <Core/Constants.h>
 #include <map>
 
+struct RayHit
+{
+	float hitWorldX;
+	float hitWorldY;
+	float distance;
+};
+
 class Raycaster
 {
 private:
@@ -24,6 +31,8 @@ private:
 
 public:
 	Raycaster(int screenWidth, int screenHeight, const int* mapData, int mapWidth, int mapHeight, int tileSize);
+
+	RayHit CastRay(float playerX, float playerY, float playerAngle);
 
 	void Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle);
 	void LoadTexture(int wallType, const std::string& texturePath);
