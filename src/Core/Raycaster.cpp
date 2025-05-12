@@ -2,9 +2,7 @@
 
 void Raycaster::LoadTextures()
 {
-	LoadTexture(1, "Resources/Textures/brickwall.png");
-	LoadTexture(2, "Resources/Textures/stonewall.png");
-	LoadTexture(3, "Resources/Textures/woodwall.png");
+	LoadTexture(1, "Resources/Textures/wall3.png");
 }
 
 void Raycaster::LoadTexture(int wallType, const std::string& texturePath)

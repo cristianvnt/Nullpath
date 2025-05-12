@@ -23,7 +23,8 @@ void GameState::InitWorld()
 
 	// Place player ona random empty cell (odd coords to ensure valid paths)
 	auto [px, py] = maze.FindRandomEmpty();
-	player->SetPosition(px * maze.GetTileSize(), py * maze.GetTileSize());
+	float offset = maze.GetTileSize() / 2.f;
+	player->SetPosition(px * maze.GetTileSize() + offset, py * maze.GetTileSize() + offset);
 
 	// Reinit raycaster with the current map and player
 	if (raycaster)
