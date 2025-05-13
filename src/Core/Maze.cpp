@@ -12,13 +12,8 @@ Maze::Maze(int width, int height, int tileSize)
 
 void Maze::GenerateMazeDFS()
 {
-	// Either way i guess
-	// Fill entire grid with wall types 1 or 1 2 and 3
+	// Fill entire grid with wall type 1
 	std::fill(data.begin(), data.end(), 1);
-	/*std::uniform_int_distribution<> wallDistrib(1, 6);
-	for (int i = 0; i < width * height; i++)
-		data[i] = wallDistrib(rng);*/
-
 	std::fill(visited.begin(), visited.end(), false);
 
 	// Start at random odd coords
