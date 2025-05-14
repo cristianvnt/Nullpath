@@ -4,7 +4,7 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboar
 	: State(window, keybinds, states),
 	player(new Player()),
 	raycaster(nullptr),
-	maze(20, 10, 32),
+	map(20, 10, 32),
 	minimap(nullptr)
 {
 	this->InitWorld();
@@ -19,12 +19,12 @@ GameState::~GameState()
 
 void GameState::InitWorld()
 {
-	maze.GenerateMazeDFS();
+	map.GenerateMapDFS();
 
 	// Place player ona random empty cell (odd coords to ensure valid paths)
-	auto [px, py] = maze.FindRandomEmpty();
-	float offset = maze.GetTileSize() / 2.f;
-	player->SetPosition(px * maze.GetTileSize() + offset, py * maze.GetTileSize() + offset);
+	auto [px, py] = map.FindRandomEmpty();
+	float offset = map.GetTileSize() / 2.f;
+	player->SetPosition(px * map.GetTileSize() + offset, py * map.GetTileSize() + offset);
 
 	// Reinit raycaster with the current map and player
 	if (raycaster)
@@ -33,20 +33,20 @@ void GameState::InitWorld()
 	raycaster = new Raycaster(
 		window->getSize().x,
 		window->getSize().y,
-		maze.GetData(),
-		maze.GetWidth(),
-		maze.GetHeight(),
-		maze.GetTileSize()
+		map.GetData(),
+		map.GetWidth(),
+		map.GetHeight(),
+		map.GetTileSize()
 	);
 
 	if (minimap)
 		delete minimap;
 
 	minimap = new Minimap(
-		maze.GetWidth(),
-		maze.GetHeight(),
-		maze.GetTileSize(),
-		maze.GetData(),
+		map.GetWidth(),
+		map.GetHeight(),
+		map.GetTileSize(),
+		map.GetData(),
 		raycaster
 	);
 }
@@ -88,5 +88,5 @@ void GameState::Render(sf::RenderTarget* target)
 
 int GameState::GetTile(int x, int y) const
 {
-	return maze.GetTile(x, y);
+	return map.GetTile(x, y);
 }

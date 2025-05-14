@@ -1,6 +1,6 @@
-#include "Maze.h"
+#include "Map.h"
 
-Maze::Maze(int width, int height, int tileSize)
+Map::Map(int width, int height, int tileSize)
 	:width(width),
 	height(height),
 	tileSize(tileSize),
@@ -10,9 +10,9 @@ Maze::Maze(int width, int height, int tileSize)
 {
 }
 
-void Maze::GenerateMazeDFS()
+void Map::GenerateMapDFS()
 {
-	// Fill entire grid with wall type 1
+	// Fill entire map with wall type 1
 	std::fill(data.begin(), data.end(), 1);
 	std::fill(visited.begin(), visited.end(), false);
 
@@ -23,7 +23,7 @@ void Maze::GenerateMazeDFS()
 	CarveDFS(sx, sy);
 }
 
-void Maze::CarveDFS(int x, int y)
+void Map::CarveDFS(int x, int y)
 {
 	int idx = y * width + x;
 	// Mark current cell as empty and visited
@@ -52,7 +52,7 @@ void Maze::CarveDFS(int x, int y)
 	}
 }
 
-std::pair<int, int> Maze::FindRandomEmpty()
+std::pair<int, int> Map::FindRandomEmpty()
 {
 	std::vector<int> empties;
 	empties.reserve(width * height / 2);
@@ -71,29 +71,29 @@ std::pair<int, int> Maze::FindRandomEmpty()
 	return { idx % width, idx / width };
 }
 
-int Maze::GetWidth() const
+int Map::GetWidth() const
 {
 	return width;
 }
 
-int Maze::GetHeight() const
+int Map::GetHeight() const
 {
 	return height;
 }
 
-int Maze::GetTileSize() const
+int Map::GetTileSize() const
 {
 	return tileSize;
 }
 
-int Maze::GetTile(int x, int y) const
+int Map::GetTile(int x, int y) const
 {
 	if (x < 0 || y < 0 || x >= width || y >= height)
 		return -1;
 	return data[y * width + x];
 }
 
-const int* Maze::GetData() const
+const int* Map::GetData() const
 {
 	return data.data();
 }

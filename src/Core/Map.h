@@ -1,11 +1,11 @@
-#ifndef MAZE_H
-#define MAZE_H
+#ifndef MAP_H
+#define MAP_H
 
 #include <vector>
 #include <random>
 #include <array>
 
-class Maze
+class Map
 {
 private:
 	int width;
@@ -15,16 +15,16 @@ private:
 	std::vector<int> data;
 	std::vector<bool> visited;
 
-	// RNG engine for maze generation and random placements
+	// RNG engine for map generation and random placements
 	std::mt19937 rng;
 
-	// DFS based maze generation methods
+	// DFS based map generation methods
 	void CarveDFS(int x, int y);
 	
 public:
-	Maze(int width, int height, int tileSize);
+	Map(int width, int height, int tileSize);
 	
-	void GenerateMazeDFS();
+	void GenerateMapDFS();
 	std::pair<int, int> FindRandomEmpty();
 	int GetWidth() const;
 	int GetHeight() const;
@@ -33,4 +33,4 @@ public:
 	const int* GetData() const;
 };
 
-#endif // !MAZE_H
+#endif // !MAP_H

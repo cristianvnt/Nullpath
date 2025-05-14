@@ -5,7 +5,7 @@
 #include "Raycaster.h"
 #include "Entities/Player.h"
 #include "Minimap.h"
-#include "Maze.h"
+#include "Map.h"
 
 #include <vector>
 #include <random>
@@ -16,7 +16,7 @@ private:
 	Player* player;
 	Raycaster* raycaster;
 	Minimap* minimap;
-	Maze maze;
+	Map map;
 
 	void InitWorld();
 
