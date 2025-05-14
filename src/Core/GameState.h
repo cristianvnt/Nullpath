@@ -6,6 +6,7 @@
 #include "Entities/Player.h"
 #include "Minimap.h"
 #include "Map.h"
+#include "generators/DFSGenerator.h"
 
 #include <vector>
 #include <random>
@@ -27,7 +28,7 @@ public:
 	void HandleKey(sf::Keyboard::Key code) override;
 	void Update(float dt) override;
 	void Render(sf::RenderTarget* target = nullptr) override;
-	int GetTile(int x, int y) const;
+	int GetCell(int x, int y) const;
 };
 
 #endif

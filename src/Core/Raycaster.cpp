@@ -16,9 +16,9 @@ void Raycaster::LoadTexture(int wallType, const std::string& texturePath)
 	wallTextures[wallType] = std::move(texture);
 }
 
-Raycaster::Raycaster(int screenWidth, int screenHeight, const int* mapData, int mapWidth, int mapHeight, int tileSize)
+Raycaster::Raycaster(int screenWidth, int screenHeight, const int* mapData, int mapWidth, int mapHeight, int cellSize)
 	: screenWidth(screenWidth), screenHeight(screenHeight), 
-	mapData(mapData), mapWidth(mapWidth), mapHeight(mapHeight), tileSize(tileSize)
+	mapData(mapData), mapWidth(mapWidth), mapHeight(mapHeight), cellSize(cellSize)
 {
 	LoadTextures();
 }
@@ -29,8 +29,8 @@ RayHit Raycaster::CastRay(float playerX, float playerY, float rayAngle)
 	float rayDirY = sin(rayAngle);
 
 	// Current map cell of player
-	int mapX = static_cast<int>(playerX / tileSize);
-	int mapY = static_cast<int>(playerY / tileSize);
+	int mapX = static_cast<int>(playerX / cellSize);
+	int mapY = static_cast<int>(playerY / cellSize);
 
 	// Distance to next x or y-side
 	float deltaDistX = (rayDirX == 0.f) ? 1e30f : std::abs(1.0f / rayDirX);
@@ -43,23 +43,23 @@ RayHit Raycaster::CastRay(float playerX, float playerY, float rayAngle)
 	if (rayDirX < 0)
 	{
 		stepX = -1;
-		sideDistX = ((playerX / tileSize) - mapX) * deltaDistX;
+		sideDistX = ((playerX / cellSize) - mapX) * deltaDistX;
 	}
 	else
 	{
 		stepX = 1;
-		sideDistX = (mapX + 1.0f - (playerX / tileSize)) * deltaDistX;
+		sideDistX = (mapX + 1.0f - (playerX / cellSize)) * deltaDistX;
 	}
 
 	if (rayDirY < 0)
 	{
 		stepY = -1;
-		sideDistY = ((playerY / tileSize) - mapY) * deltaDistY;
+		sideDistY = ((playerY / cellSize) - mapY) * deltaDistY;
 	}
 	else
 	{
 		stepY = 1;
-		sideDistY = (mapY + 1.0f - (playerY / tileSize)) * deltaDistY;
+		sideDistY = (mapY + 1.0f - (playerY / cellSize)) * deltaDistY;
 	}
 
 	// DDA loop
@@ -96,7 +96,7 @@ RayHit Raycaster::CastRay(float playerX, float playerY, float rayAngle)
 
 	float perpDistCells = rawDist;
 
-	float perpDistPixels = perpDistCells * tileSize;
+	float perpDistPixels = perpDistCells * cellSize;
 	float hitX = playerX + rayDirX * perpDistPixels;
 	float hitY = playerY + rayDirY * perpDistPixels;
 
@@ -139,8 +139,8 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 		float rayDirY = sin(rayAngle);
 
 		// Current map cell of player
-		int mapX = static_cast<int>(playerX / tileSize);
-		int mapY = static_cast<int>(playerY / tileSize);
+		int mapX = static_cast<int>(playerX / cellSize);
+		int mapY = static_cast<int>(playerY / cellSize);
 
 		// Distance to next x or y-side
 		float deltaDistX = (rayDirX == 0.f) ? 1e30f : std::abs(1.0f / rayDirX);
@@ -153,23 +153,23 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 		if (rayDirX < 0)
 		{
 			stepX = -1;
-			sideDistX = ((playerX / tileSize) - mapX) * deltaDistX;
+			sideDistX = ((playerX / cellSize) - mapX) * deltaDistX;
 		}
 		else
 		{
 			stepX = 1;
-			sideDistX = (mapX + 1.0f - (playerX / tileSize)) * deltaDistX;
+			sideDistX = (mapX + 1.0f - (playerX / cellSize)) * deltaDistX;
 		}
 
 		if (rayDirY < 0)
 		{
 			stepY = -1;
-			sideDistY = ((playerY / tileSize) - mapY) * deltaDistY;
+			sideDistY = ((playerY / cellSize) - mapY) * deltaDistY;
 		}
 		else
 		{
 			stepY = 1;
-			sideDistY = (mapY + 1.0f - (playerY / tileSize)) * deltaDistY;
+			sideDistY = (mapY + 1.0f - (playerY / cellSize)) * deltaDistY;
 		}
 
 		// DDA: perform grid traversal to find wall hit
@@ -224,9 +224,9 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 		// UV mapping: calculate exact hit position on wall
 		float wallX;
 		if (side == 0)
-			wallX = playerY / tileSize + rawDist * rayDirY;
+			wallX = playerY / cellSize + rawDist * rayDirY;
 		else
-			wallX = playerX / tileSize + rawDist * rayDirX;
+			wallX = playerX / cellSize + rawDist * rayDirX;
 		wallX -= std::floor(wallX);
 
 		int texX = int(wallX * textureSize);

@@ -20,7 +20,7 @@ private:
 	int screenHeight;
 	int mapWidth;
 	int mapHeight;
-	int tileSize;
+	int cellSize;
 
 	const int* mapData;
 
@@ -30,7 +30,7 @@ private:
 	void LoadTextures();
 
 public:
-	Raycaster(int screenWidth, int screenHeight, const int* mapData, int mapWidth, int mapHeight, int tileSize);
+	Raycaster(int screenWidth, int screenHeight, const int* mapData, int mapWidth, int mapHeight, int cellSize);
 
 	RayHit CastRay(float playerX, float playerY, float playerAngle);
 

@@ -19,12 +19,13 @@ GameState::~GameState()
 
 void GameState::InitWorld()
 {
-	map.GenerateMapDFS();
+	DFSGenerator dfs;
+	dfs.Generate(map);
 
 	// Place player ona random empty cell (odd coords to ensure valid paths)
 	auto [px, py] = map.FindRandomEmpty();
-	float offset = map.GetTileSize() / 2.f;
-	player->SetPosition(px * map.GetTileSize() + offset, py * map.GetTileSize() + offset);
+	float offset = map.GetCellSize() / 2.f;
+	player->SetPosition(px * map.GetCellSize() + offset, py * map.GetCellSize() + offset);
 
 	// Reinit raycaster with the current map and player
 	if (raycaster)
@@ -36,7 +37,7 @@ void GameState::InitWorld()
 		map.GetData(),
 		map.GetWidth(),
 		map.GetHeight(),
-		map.GetTileSize()
+		map.GetCellSize()
 	);
 
 	if (minimap)
@@ -45,7 +46,7 @@ void GameState::InitWorld()
 	minimap = new Minimap(
 		map.GetWidth(),
 		map.GetHeight(),
-		map.GetTileSize(),
+		map.GetCellSize(),
 		map.GetData(),
 		raycaster
 	);
@@ -67,7 +68,7 @@ void GameState::Update(float dt)
 
 	this->UpdateMousePositions();
 	this->UpdateInput();
-	this->player->Update(dt, [this](int x, int y) { return this->GetTile(x, y); });
+	this->player->Update(dt, [this](int x, int y) { return this->GetCell(x, y); });
 }
 
 void GameState::Render(sf::RenderTarget* target)
@@ -86,7 +87,7 @@ void GameState::Render(sf::RenderTarget* target)
 	minimap->Render(*target, player->GetX(), player->GetY(), player->GetAngle());
 }
 
-int GameState::GetTile(int x, int y) const
+int GameState::GetCell(int x, int y) const
 {
-	return map.GetTile(x, y);
+	return static_cast<int>(map.GetCell(x, y));
 }

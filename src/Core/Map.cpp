@@ -1,74 +1,13 @@
 #include "Map.h"
 
-Map::Map(int width, int height, int tileSize)
+Map::Map(int width, int height, int cellSize)
 	:width(width),
 	height(height),
-	tileSize(tileSize),
+	cellSize(cellSize),
 	data(width * height),
 	visited(width * height),
 	rng(std::random_device{}())
 {
-}
-
-void Map::GenerateMapDFS()
-{
-	// Fill entire map with wall type 1
-	std::fill(data.begin(), data.end(), 1);
-	std::fill(visited.begin(), visited.end(), false);
-
-	// Start at random odd coords
-	int sx = (rng() % (width / 2)) * 2 + 1;
-	int sy = (rng() % (height / 2)) * 2 + 1;
-
-	CarveDFS(sx, sy);
-}
-
-void Map::CarveDFS(int x, int y)
-{
-	int idx = y * width + x;
-	// Mark current cell as empty and visited
-	data[idx] = 0;
-	visited[idx] = true;
-
-	std::array<std::pair<int, int>, 4> dirs = {
-		std::make_pair(0, -1),
-		std::make_pair(1, 0),
-		std::make_pair(0, 1),
-		std::make_pair(-1, 0)
-	};
-	std::shuffle(dirs.begin(), dirs.end(), rng);
-
-	for (auto& [dx, dy] : dirs)
-	{
-		int nx = x + dx * 2;
-		int ny = y + dy * 2;
-
-		if (nx >= 1 && ny >= 1 && nx < width - 1 && ny < height - 1 && !visited[ny * width + nx])
-		{
-			// Remove walls between cells and recurse into next cell
-			data[(y + dy) * width + (x + dx)] = 0;
-			CarveDFS(nx, ny);
-		}
-	}
-}
-
-std::pair<int, int> Map::FindRandomEmpty()
-{
-	std::vector<int> empties;
-	empties.reserve(width * height / 2);
-
-	for (int y = 0; y < height; y++)
-		for (int x = 0; x < width; x++)
-			if (data[y * width + x] == 0)
-				empties.push_back(y * width + x);
-
-	if (empties.empty())
-		return { 1, 1 };
-
-	std::uniform_int_distribution<> dist(0, empties.size() - 1);
-	int idx = empties[dist(rng)];
-
-	return { idx % width, idx / width };
 }
 
 int Map::GetWidth() const
@@ -81,19 +20,62 @@ int Map::GetHeight() const
 	return height;
 }
 
-int Map::GetTileSize() const
+int Map::GetCellSize() const
 {
-	return tileSize;
-}
-
-int Map::GetTile(int x, int y) const
-{
-	if (x < 0 || y < 0 || x >= width || y >= height)
-		return -1;
-	return data[y * width + x];
+	return cellSize;
 }
 
 const int* Map::GetData() const
 {
-	return data.data();
+	return reinterpret_cast<const int*>(data.data());
+}
+
+void Map::Clear(Cell cellType)
+{
+	std::fill(data.begin(), data.end(), cellType);
+	ResetVisited();
+}
+
+void Map::SetCell(int x, int y, Cell c)
+{
+	data[y * width + x] = c;
+}
+
+Cell Map::GetCell(int x, int y) const
+{
+	return data[y * width + x];
+}
+
+void Map::ResetVisited()
+{
+	std::fill(visited.begin(), visited.end(), false);
+}
+
+bool Map::IsVisited(int x, int y) const
+{
+	return visited[y * width + x];
+}
+
+void Map::MarkVisited(int x, int y)
+{
+	visited[y * width + x] = true;
+}
+
+std::pair<int, int> Map::FindRandomEmpty() const
+{
+	std::uniform_int_distribution<> distW(0, width - 1);
+	std::uniform_int_distribution<> distH(0, height - 1);
+	
+	while (true)
+	{
+		int x = distW(rng);
+		int y = distH(rng);
+		if (GetCell(x, y) == Cell::Floor)
+			return { x, y };
+	}
+}
+
+std::mt19937& Map::GetRng() const
+{
+	return rng;
 }

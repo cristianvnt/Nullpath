@@ -9,7 +9,7 @@ class Minimap
 private:
 	int mapWidth;
 	int mapHeight;
-	int tileSize;
+	int cellSize;
 	const int* mapData;
 	Raycaster* raycaster;
 
@@ -19,7 +19,7 @@ private:
 	int slices = 60;
 
 public:
-	Minimap(int mapWidth, int mapHeight, int tileSize, const int* mapData, Raycaster* raycaster);
+	Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster);
 
 	void Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle);
 };

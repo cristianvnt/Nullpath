@@ -5,32 +5,41 @@
 #include <random>
 #include <array>
 
+enum class Cell : int
+{
+	Wall = 1,
+	Floor = 0
+};
+
 class Map
 {
 private:
 	int width;
 	int height;
-	int tileSize;
+	int cellSize;
 
-	std::vector<int> data;
+	std::vector<Cell> data;
 	std::vector<bool> visited;
-
-	// RNG engine for map generation and random placements
-	std::mt19937 rng;
-
-	// DFS based map generation methods
-	void CarveDFS(int x, int y);
+	mutable std::mt19937 rng;
 	
 public:
-	Map(int width, int height, int tileSize);
+	Map(int width, int height, int cellSize);
 	
-	void GenerateMapDFS();
-	std::pair<int, int> FindRandomEmpty();
 	int GetWidth() const;
 	int GetHeight() const;
-	int GetTileSize() const;
-	int GetTile(int x, int y) const;
+	int GetCellSize() const;
 	const int* GetData() const;
+
+	void Clear(Cell cellType);
+	void SetCell(int x, int y, Cell c);
+	Cell GetCell(int x, int y) const;
+
+	void ResetVisited();
+	bool IsVisited(int x, int y) const;
+	void MarkVisited(int x, int y);
+
+	std::pair<int, int> FindRandomEmpty() const;
+	std::mt19937& GetRng() const;
 };
 
 #endif // !MAP_H
