@@ -7,28 +7,12 @@
 class BSPGenerator
 {
 private:
-	struct Node
-	{
-		sf::Vector2i pos, size;
-		std::unique_ptr<int> left, right;
-		sf::Vector2i roomPos, roomSize;
-
-		Node(sf::Vector2i p, sf::Vector2i s);
-		bool Split(int minSize);
-		void CreateRoom(int minSize);
-	};
-
-	void SplitRecursive(std::unique_ptr<Node>& node);
-	void CreateRoomRecursive(const std::unique_ptr<Node>& node, Map& map);
-	void ConnectChildren(const std::unique_ptr<Node>& node, Map& map);
-	void CarveHorizontal(Map& map, int x1, int x2, int y);
-	void CarveVertical(Map& map, int y1, int y2, int x);
-
-	int minRoomSize;
-	std::unique_ptr<Node> root;
+	int minRoomSizeCells;
+	float splitRatio;
+	int paddingCells;
 
 public:
-	explicit BSPGenerator(int minRoomSize = 6);
+	explicit BSPGenerator(int minRoomSizeCells = 6, float splitRatio = 1.25f, int paddingCells = 1);
 	void Generate(Map& map);
 };
 

@@ -2,7 +2,7 @@
 #define RAYCASTER_H
 
 #include <SFML/Graphics.hpp>
-#include <Core/Constants.h>
+#include <Core/Math.h>
 #include <vector>
 #include <map>
 

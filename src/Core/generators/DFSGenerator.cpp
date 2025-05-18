@@ -13,7 +13,7 @@ void DFSGenerator::Carve(int x, int y, Map& map)
 		std::make_pair(-1, 0)
 	};
 	// Shuffle to randomize DFS order
-	std::shuffle(dirs.begin(), dirs.end(), map.GetRng());
+	std::shuffle(dirs.begin(), dirs.end(), Math::Rng());
 
 	for (auto& [dx, dy] : dirs)
 	{
@@ -35,9 +35,11 @@ void DFSGenerator::Generate(Map& map)
 	map.Clear(Cell::Wall);
 	map.ResetVisited();
 
-	// Start at random odd coords
-	int sx = (map.GetRng()() % (map.GetWidth() / 2)) * 2 + 1;
-	int sy = (map.GetRng()() % (map.GetHeight() / 2)) * 2 + 1;
+	// Start at random odd coordinates
+	std::uniform_int_distribution<int> distX(0, map.GetWidth() / 2 - 1);
+	std::uniform_int_distribution<int> distY(0, map.GetHeight() / 2 - 1);
+	int sx = distX(Math::Rng()) * 2 + 1;
+	int sy = distY(Math::Rng()) * 2 + 1;
 
 	Carve(sx, sy, map);
 }

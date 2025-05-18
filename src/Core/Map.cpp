@@ -5,8 +5,7 @@ Map::Map(int width, int height, int cellSize)
 	height(height),
 	cellSize(cellSize),
 	data(width * height),
-	visited(width * height),
-	rng(std::random_device{}())
+	visited(width * height)
 {
 }
 
@@ -63,6 +62,7 @@ void Map::MarkVisited(int x, int y)
 
 std::pair<int, int> Map::FindRandomEmpty() const
 {
+	auto& rng = Math::Rng();
 	std::uniform_int_distribution<> distW(0, width - 1);
 	std::uniform_int_distribution<> distH(0, height - 1);
 	
@@ -73,9 +73,4 @@ std::pair<int, int> Map::FindRandomEmpty() const
 		if (GetCell(x, y) == Cell::Floor)
 			return { x, y };
 	}
-}
-
-std::mt19937& Map::GetRng() const
-{
-	return rng;
 }

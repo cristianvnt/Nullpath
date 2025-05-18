@@ -1,6 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include "Math.h"
 #include <vector>
 #include <random>
 #include <array>
@@ -20,7 +21,6 @@ private:
 
 	std::vector<Cell> data;
 	std::vector<bool> visited;
-	mutable std::mt19937 rng;
 	
 public:
 	Map(int width, int height, int cellSize);
@@ -39,7 +39,6 @@ public:
 	void MarkVisited(int x, int y);
 
 	std::pair<int, int> FindRandomEmpty() const;
-	std::mt19937& GetRng() const;
 };
 
 #endif // !MAP_H
