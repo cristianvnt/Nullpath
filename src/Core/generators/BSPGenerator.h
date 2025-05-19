@@ -12,8 +12,8 @@ private:
 	int paddingCells;
 
 public:
-	explicit BSPGenerator(int minRoomSizeCells = 6, float splitRatio = 1.25f, int paddingCells = 1);
-	void Generate(Map& map);
+	explicit BSPGenerator(int minRoomSizeCells = 3, float splitRatio = 1.25f, int paddingCells = 1);
+	void Generate(Map& map) const;
 };
 
 #endif // !BPSGENERATOR_H

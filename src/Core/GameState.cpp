@@ -4,10 +4,10 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboar
 	: State(window, keybinds, states),
 	player(new Player()),
 	raycaster(nullptr),
-	map(20, 10, 32),
+	map(30, 30, 32),
 	minimap(nullptr)
 {
-	this->InitWorld();
+	this->InitWorldDFS();
 }
 
 GameState::~GameState()
@@ -17,10 +17,26 @@ GameState::~GameState()
 	delete this->minimap;
 }
 
-void GameState::InitWorld()
+void GameState::InitWorldDFS()
 {
-	DFSGenerator dfs;
-	dfs.Generate(map);
+	RegenerateWorld([&](Map& map) {
+		DFSGenerator dfs;
+		dfs.Generate(map);
+	});
+}
+
+void GameState::InitWorldBSP()
+{
+	RegenerateWorld([&](Map& map) {
+		BSPGenerator bsp(3, 1.25, 2);
+		bsp.Generate(map);
+	});
+}
+
+void GameState::RegenerateWorld(const std::function<void(Map&)>& generator)
+{
+	map.Clear(Cell::Wall);
+	generator(map);
 
 	// Place player ona random empty cell (odd coords to ensure valid paths)
 	auto [px, py] = map.FindRandomEmpty();
@@ -58,7 +74,10 @@ void GameState::HandleKey(sf::Keyboard::Key code)
 		EndState();
 
 	if (code == sf::Keyboard::Key::R)
-		InitWorld();
+		InitWorldDFS();
+
+	if (code == sf::Keyboard::Key::T)
+		InitWorldBSP();
 }
 
 void GameState::Update(float dt)

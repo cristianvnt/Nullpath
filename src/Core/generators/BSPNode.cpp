@@ -1,4 +1,4 @@
-#include "BSPNode.h"
+﻿#include "BSPNode.h"
 #include "Core/Math.h"
 
 BSPNode::BSPNode(const sf::FloatRect& area)
@@ -15,21 +15,36 @@ BSPNode::BSPNode(const sf::FloatRect& area)
 
 bool BSPNode::canSplit(int minSizePx) const
 {
-	return bounds.size.x > 2 * minSizePx || bounds.size.y > 2 * minSizePx;
+	const float epsilon = 2.f;
+	return bounds.size.x > 2 * minSizePx - epsilon || bounds.size.y > 2 * minSizePx - epsilon;
 }
 
-void BSPNode::choosePartition(int minSizePx, float ratio)
+bool BSPNode::choosePartition(int minSizePx, float ratio)
 {
 	auto& rng = Math::Rng();
-	bool horizontal = std::uniform_int_distribution<int>(0, 1)(rng) == false;
 
-	if (bounds.size.x > bounds.size.y * ratio)
-		horizontal = false;
-	else if (bounds.size.y > bounds.size.x * ratio)
-		horizontal = true;
+	bool canV = bounds.size.x > 2 * minSizePx;
+	bool canH = bounds.size.y > 2 * minSizePx;
+
+	if (!canH && !canV) {
+		return false;
+	}
+
+	bool horizontal;
+	if (canH && canV)
+		horizontal = std::uniform_int_distribution<int>(0, 1)(rng) == 0;
+	else
+		horizontal = canH;
+
+	isVertical = !horizontal;
 
 	float span = horizontal ? bounds.size.y : bounds.size.x;
-	std::uniform_real_distribution<float> dist(minSizePx, span - minSizePx);
+	float maxOffset = span - minSizePx;
+	
+	if (maxOffset <= minSizePx)
+		return false;
+
+	std::uniform_real_distribution<float> dist(minSizePx, maxOffset);
 	float offset = dist(rng);
 
 	if (horizontal)
@@ -42,45 +57,102 @@ void BSPNode::choosePartition(int minSizePx, float ratio)
 		partitionLine.x = bounds.position.x + offset;
 		partitionLine.y = bounds.position.y;
 	}
+
+	return true;
 }
 
 void BSPNode::carveRoom(int minRoomSizePx, int paddingPx)
 {
 	auto& rng = Math::Rng();
-	float maxW = bounds.size.x - paddingPx;
-	float maxH = bounds.size.y - paddingPx;
+
+	// Ensure we have valid dimensions to work with
+	int adjustedPadding = paddingPx / 2;
+	float safeWidth = std::max(1.0f, bounds.size.x - adjustedPadding);
+	float safeHeight = std::max(1.0f, bounds.size.y - adjustedPadding);
+	float safeMinSize = std::min({ static_cast<float>(minRoomSizePx), safeWidth, safeHeight });
+
+	if (safeMinSize <= 0)
+	{
+		room = sf::FloatRect({ 0,0 }, { 0,0 });
+		return;
+	}
+
+	// Calculate max width and height for the room
+	float maxW = std::max(bounds.size.x - paddingPx, safeMinSize);
+	float maxH = std::max(bounds.size.y - paddingPx, safeMinSize);
+
+	if (maxW < minRoomSizePx || maxH < minRoomSizePx) {
+		room = sf::FloatRect({ 0,0 }, { 0,0 });
+		return;
+	}
+
 	std::uniform_real_distribution<float> distW(minRoomSizePx, maxW);
 	std::uniform_real_distribution<float> distH(minRoomSizePx, maxH);
 	float w = distW(rng);
 	float h = distH(rng);
 
-	std::uniform_real_distribution<float> distX(
-		bounds.position.x + paddingPx / 2.f, 
-		bounds.position.x + bounds.size.x - w - paddingPx / 2.f);
+	float maxX = bounds.position.x + bounds.size.x - w - paddingPx / 2.f;
+	float maxY = bounds.position.y + bounds.size.y - h - paddingPx / 2.f;
+	float minX = bounds.position.x + paddingPx / 2.f;
+	float minY = bounds.position.y + paddingPx / 2.f;
 
-	std::uniform_real_distribution<float> distY(
-		bounds.position.y + paddingPx / 2.f,
-		bounds.position.y + bounds.size.y - h - paddingPx / 2.f);
-	float x = distX(rng);
-	float y = distY(rng);
+	// Ensure valid distribution range
+	if (maxX < minX)
+		maxX = minX;
+	if (maxY < minY)
+		maxY = minY;
 
+	float x, y;
+	if (maxX > minX)
+	{
+		std::uniform_real_distribution<float> distX(minX, maxX);
+		x = distX(rng);
+	}
+	else
+	{
+		x = minX;
+	}
+
+	if (maxY > minY)
+	{
+		std::uniform_real_distribution<float> distY(minY, maxY);
+		y = distY(rng);
+	}
+	else
+	{
+		y = minY;
+	}
+	
 	room = sf::FloatRect({ x, y }, { w, h });
 }
 
 void BSPNode::carveBetween(const sf::Vector2f& a, const sf::Vector2f& b)
 {
+	if (a.x < bounds.position.x || a.x > bounds.position.x + bounds.size.x ||
+		a.y < bounds.position.y || a.y > bounds.position.y + bounds.size.y ||
+		b.x < bounds.position.x || b.x > bounds.position.x + bounds.size.x ||
+		b.y < bounds.position.y || b.y > bounds.position.y + bounds.size.y)
+	{
+		return;
+	}
 	corridors.emplace_back(a, b);
 }
 
-void BSPNode::Split(int minSizePx, float ratio)
+void BSPNode::Split(int minSizePx, float ratio, int depth)
 {
-	if (!canSplit(minSizePx))
+	if (depth > 5)
 	{
 		isLeaf = true;
 		return;
 	}
+
+	if (!canSplit(minSizePx) || !choosePartition(minSizePx, ratio))
+	{
+		isLeaf = true;
+		return;
+	}
+
 	isLeaf = false;
-	choosePartition(minSizePx, ratio);
 
 	if (!isVertical)
 	{
@@ -101,8 +173,8 @@ void BSPNode::Split(int minSizePx, float ratio)
 		backNode = std::make_unique<BSPNode>(backRect);
 	}
 
-	frontNode->Split(minSizePx, ratio);
-	backNode->Split(minSizePx, ratio);
+	frontNode->Split(minSizePx, ratio, depth + 1);
+	backNode->Split(minSizePx, ratio, depth + 1);
 }
 
 void BSPNode::GenerateRooms(int minRoomSizePx, int paddingPx)
@@ -118,17 +190,27 @@ void BSPNode::GenerateRooms(int minRoomSizePx, int paddingPx)
 
 void BSPNode::CreateCorridors()
 {
-	if (isLeaf)
+	if (isLeaf || !frontNode || !backNode)
 		return;
+
+	bool isFrontValid = (frontNode->room.size.x > 0 && frontNode->room.size.y > 0);
+	bool isBackValid = (backNode->room.size.x > 0 && backNode->room.size.y > 0);
+
+	if (isFrontValid && isBackValid) {
+		sf::Vector2f c1(
+			frontNode->room.position.x + frontNode->room.size.x / 2,
+			frontNode->room.position.y + frontNode->room.size.y / 2
+		);
+		sf::Vector2f c2(
+			backNode->room.position.x + backNode->room.size.x / 2,
+			backNode->room.position.y + backNode->room.size.y / 2
+		);
+
+		carveBetween(c1, c2);
+	}
 
 	frontNode->CreateCorridors();
 	backNode->CreateCorridors();
-
-	sf::Vector2f c1(frontNode->room.position.x + frontNode->room.size.x / 2.f, frontNode->room.position.y + frontNode->room.size.y);
-	sf::Vector2f c2(backNode->room.position.x + backNode->room.size.x / 2.f, backNode->room.position.y + backNode->room.size.y);
-
-	carveBetween({ c1 }, { c2.x, c1.y });
-	carveBetween({ c2.x, c1.y }, c2);
 }
 
 void BSPNode::RenderDebug(sf::RenderWindow& window) const

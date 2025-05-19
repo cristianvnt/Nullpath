@@ -3,11 +3,14 @@
 Minimap::Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster)
 	: mapWidth(mapWidth), mapHeight(mapHeight), cellSize(cellSize), mapData(mapData), raycaster(raycaster)
 {
+	float mapWidthPx = mapWidth * cellSize;
+	float mapHeightPx = mapHeight * cellSize;
+	scale = std::min(maxSize / mapWidthPx, maxSize / mapHeightPx);
 }
 
 void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle)
 {
-	float miniCell = cellSize * 0.6f;
+	float miniCell = cellSize * scale;
 	sf::RectangleShape cell({ miniCell, miniCell });
 	const float margin = 10.f;
 	for (int y = 0; y < mapHeight; y++)

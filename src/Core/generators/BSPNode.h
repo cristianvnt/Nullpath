@@ -17,15 +17,15 @@ private:
 	std::vector<std::pair<sf::Vector2f, sf::Vector2f>> corridors;
 
 	bool canSplit(int minSizePx) const;
-	void choosePartition(int minSizePx, float ratio);
+	bool choosePartition(int minSizePx, float ratio);
 	void carveRoom(int minRoomSizePx, int paddingPx);
 	void carveBetween(const sf::Vector2f& a, const sf::Vector2f& b);
 
 public:
 	explicit BSPNode(const sf::FloatRect& area);
 
-	void Split(int minSizePx, float ratio = 1.25);
-	void GenerateRooms(int minRoomSizePx, int paddingPx = 4);
+	void Split(int minSizePx, float ratio = 1.25, int depth = 0);
+	void GenerateRooms(int minRoomSizePx, int paddingPx = 5);
 	void CreateCorridors();
 	void RenderDebug(sf::RenderWindow& window) const;
 
@@ -33,6 +33,9 @@ public:
 	bool IsVertical() const { return isVertical; }
 	const sf::FloatRect& Room() const { return room; }
 	const auto& Corridors() const { return corridors; }
+
+	const BSPNode* Front() const { return frontNode.get(); }
+	const BSPNode* Back() const { return backNode.get(); }
 
 	template <typename Func>
 	void ForEachLeaf(Func f) const
@@ -51,6 +54,5 @@ public:
 	}
 
 };
-
 
 #endif // !BSPNODE_H

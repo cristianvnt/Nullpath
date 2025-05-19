@@ -7,6 +7,7 @@
 #include "Minimap.h"
 #include "Map.h"
 #include "generators/DFSGenerator.h"
+#include "generators/BSPGenerator.h"
 
 #include <vector>
 #include <random>
@@ -19,7 +20,10 @@ private:
 	Minimap* minimap;
 	Map map;
 
-	void InitWorld();
+	void InitWorldDFS();
+	void InitWorldBSP();
+
+	void RegenerateWorld(const std::function<void(Map&)>& generator);
 
 public:
 	GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states);
