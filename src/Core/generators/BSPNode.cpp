@@ -138,6 +138,29 @@ void BSPNode::carveBetween(const sf::Vector2f& a, const sf::Vector2f& b)
 	corridors.emplace_back(a, b);
 }
 
+const BSPNode* BSPNode::getRoomNode() const
+{
+	if (isLeaf && room.size.x > 0 && room.size.y > 0)
+		return this;
+
+	const BSPNode* found = nullptr;
+	if (frontNode)
+		found = frontNode->getRoomNode();
+
+	if (!found && backNode)
+		found = backNode->getRoomNode();
+
+	return found;
+}
+
+sf::Vector2f BSPNode::centerRect(const sf::FloatRect& rect)
+{
+	return {
+		rect.position.x + rect.size.x * 0.5f,
+		rect.position.y + rect.size.y * 0.5f
+	};
+}
+
 void BSPNode::Split(int minSizePx, float ratio, int depth)
 {
 	if (depth > 5)
@@ -193,20 +216,15 @@ void BSPNode::CreateCorridors()
 	if (isLeaf || !frontNode || !backNode)
 		return;
 
-	bool isFrontValid = (frontNode->room.size.x > 0 && frontNode->room.size.y > 0);
-	bool isBackValid = (backNode->room.size.x > 0 && backNode->room.size.y > 0);
+	const BSPNode* fNode = frontNode ? frontNode->getRoomNode() : nullptr;
+	const BSPNode* bNode = backNode ? backNode->getRoomNode() : nullptr;
 
-	if (isFrontValid && isBackValid) {
-		sf::Vector2f c1(
-			frontNode->room.position.x + frontNode->room.size.x / 2,
-			frontNode->room.position.y + frontNode->room.size.y / 2
-		);
-		sf::Vector2f c2(
-			backNode->room.position.x + backNode->room.size.x / 2,
-			backNode->room.position.y + backNode->room.size.y / 2
-		);
+	if (fNode && bNode) 
+	{
+		sf::Vector2f centerF = centerRect(fNode->room);
+		sf::Vector2f centerB = centerRect(bNode->room);
 
-		carveBetween(c1, c2);
+		carveBetween(centerF, centerB);
 	}
 
 	frontNode->CreateCorridors();

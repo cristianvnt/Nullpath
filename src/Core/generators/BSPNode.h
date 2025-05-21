@@ -21,6 +21,9 @@ private:
 	void carveRoom(int minRoomSizePx, int paddingPx);
 	void carveBetween(const sf::Vector2f& a, const sf::Vector2f& b);
 
+	const BSPNode* getRoomNode() const;
+	static sf::Vector2f centerRect(const sf::FloatRect& rect);
+
 public:
 	explicit BSPNode(const sf::FloatRect& area);
 
