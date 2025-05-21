@@ -2,8 +2,9 @@
 #define MATH_H
 
 #include <iostream>
-#include <cmath>
+#include <math.h>
 #include <random>
+#include <assert.h>
 
 namespace Math
 {

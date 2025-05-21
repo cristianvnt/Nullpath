@@ -28,7 +28,7 @@ void GameState::InitWorldDFS()
 void GameState::InitWorldBSP()
 {
 	RegenerateWorld([&](Map& map) {
-		BSPGenerator bsp(3, 1.25, 2);
+		BSPGenerator bsp(3, 1.25f, 2);
 		bsp.Generate(map);
 	});
 }
@@ -39,9 +39,12 @@ void GameState::RegenerateWorld(const std::function<void(Map&)>& generator)
 	generator(map);
 
 	// Place player ona random empty cell (odd coords to ensure valid paths)
-	auto [px, py] = map.FindRandomEmpty();
-	float offset = map.GetCellSize() / 2.f;
-	player->SetPosition(px * map.GetCellSize() + offset, py * map.GetCellSize() + offset);
+	if (std::optional<std::pair<int, int>> pos = map.FindRandomEmpty(); pos)
+	{
+		auto& [px, py] = *pos;
+		float offset = map.GetCellSize() * 0.5f;
+		player->SetPosition(px * map.GetCellSize() + offset, py * map.GetCellSize() + offset);
+	}
 
 	// Reinit raycaster with the current map and player
 	if (raycaster)

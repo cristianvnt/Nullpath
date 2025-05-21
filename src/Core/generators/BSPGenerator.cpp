@@ -1,5 +1,5 @@
 #include "BSPGenerator.h"
-#include "Core/generators/BSPNode.h"
+#include "BSPNode.h"
 #include <functional>
 #include <algorithm>
 
@@ -37,7 +37,7 @@ void BSPGenerator::Generate(Map& map) const
 
 	// Build BPS tree
 	BSPNode root(fullArea);
-	root.Split(minRoomSizeCells * map.GetCellSize(), splitRatio);
+	root.Split(minRoomSizeCells * map.GetCellSize(), splitRatio, 0);
 	root.GenerateRooms(minRoomSizeCells * map.GetCellSize(), paddingCells * map.GetCellSize());
 	root.CreateCorridors();
 

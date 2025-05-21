@@ -60,17 +60,29 @@ void Map::MarkVisited(int x, int y)
 	visited[y * width + x] = true;
 }
 
-std::pair<int, int> Map::FindRandomEmpty() const
+std::optional<std::pair<int, int>> Map::FindRandomEmpty() const
 {
 	auto& rng = Math::Rng();
-	std::uniform_int_distribution<> distW(0, width - 1);
-	std::uniform_int_distribution<> distH(0, height - 1);
-	
-	while (true)
+	std::uniform_real_distribution<double> dist(0.0, 0.1);
+
+	int count = 0;
+	std::pair<int, int> chosen{ 0, 0 };
+
+	for (int y = 0; y < height; y++)
 	{
-		int x = distW(rng);
-		int y = distH(rng);
-		if (GetCell(x, y) == Cell::Floor)
-			return { x, y };
+		for (int x = 0; x < width; x++)
+		{
+			if (GetCell(x, y) == Cell::Floor)
+			{
+				++count;
+				if (dist(rng) < 1.0 / count)
+					chosen = { x, y };
+			}
+		}
 	}
+	
+	if (count == 0)
+		return std::nullopt;
+
+	return chosen;
 }

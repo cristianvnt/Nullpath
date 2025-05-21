@@ -5,6 +5,7 @@
 #include <vector>
 #include <random>
 #include <array>
+#include <optional>
 
 enum class Cell : int
 {
@@ -38,7 +39,7 @@ public:
 	bool IsVisited(int x, int y) const;
 	void MarkVisited(int x, int y);
 
-	std::pair<int, int> FindRandomEmpty() const;
+	std::optional<std::pair<int, int>> FindRandomEmpty() const;
 };
 
 #endif // !MAP_H
