@@ -9,6 +9,7 @@ class BSPNode
 private:
 	sf::FloatRect bounds;
 	bool isLeaf;
+	int roomID = -1;
 	std::unique_ptr<BSPNode> frontNode;
 	std::unique_ptr<BSPNode> backNode;
 	sf::FloatRect room;
@@ -42,7 +43,6 @@ private:
 	* Recursively find a leaf node that contains a valid room
 	*/
 	const BSPNode* getRoomNode() const;
-	static sf::Vector2f centerRect(const sf::FloatRect& rect);
 
 public:
 	explicit BSPNode(const sf::FloatRect& area);
@@ -60,17 +60,38 @@ public:
 	* Generate corridors for this node (recursively calls children)
 	*/
 	void CreateCorridors();
-	void RenderDebug(sf::RenderWindow& window) const;
+
+	static sf::Vector2f CenterRect(const sf::FloatRect& rect);
 
 	bool IsLeaf() const { return isLeaf; }
-	const sf::FloatRect& Room() const { return room; }
-	const auto& Corridors() const { return corridors; }
+	const sf::FloatRect& GetRoom() const { return room; }
+	const auto& GetCorridors() const { return corridors; }
+	sf::FloatRect GetBounds() const { return bounds; }
 
 	const BSPNode* Front() const { return frontNode.get(); }
 	const BSPNode* Back() const { return backNode.get(); }
 
+	void SetRoomID(int id) { roomID = id; }
+	int GetRoomID() const { return roomID; }
+
 	template <typename Func>
 	void ForEachLeaf(Func f) const
+	{
+		if (isLeaf)
+		{
+			f(*this);
+			return;
+		}
+
+		if (frontNode)
+			frontNode->ForEachLeaf(f);
+
+		if (backNode)
+			backNode->ForEachLeaf(f);
+	}
+
+	template <typename Func>
+	void ForEachLeaf(Func f)
 	{
 		if (isLeaf)
 		{

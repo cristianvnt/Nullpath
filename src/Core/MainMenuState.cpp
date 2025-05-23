@@ -1,4 +1,5 @@
 ﻿#include "MainMenuState.h"
+#include "Fonts.h"
 
 MainMenuState::MainMenuState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states)
 	: State(window, keybinds, states)
@@ -33,7 +34,7 @@ void MainMenuState::InitBackground()
 
 void MainMenuState::InitFonts()
 {
-	if (!this->font.openFromFile("Resources/Fonts/ThemeVCK.ttf"))
+	if (!Fonts::theme.openFromFile("Resources/Fonts/ThemeVCK.ttf"))
 	{
 		std::cerr << "Error: Failed to load font!\n";
 		return;
@@ -70,7 +71,7 @@ void MainMenuState::InitKeybinds()
 void MainMenuState::InitButtons()
 {
 	this->buttons["GAME_STATE"] = new Button(870.f, 350.f, 150.f, 50.f,
-		&this->font, "New Game", 70,
+		&Fonts::theme, "New Game", 70,
 		sf::Color(255, 0, 0, 200), sf::Color(250, 250, 250, 250), sf::Color(30, 30, 30, 50),
 		sf::Color(50, 50, 50, 0), sf::Color(150, 150, 150, 0), sf::Color(30, 30, 30, 0));
 
@@ -80,7 +81,7 @@ void MainMenuState::InitButtons()
 		sf::Color(50, 50, 50, 0), sf::Color(150, 150, 150, 0), sf::Color(30, 30, 30, 0));*/
 
 	this->buttons["EXIT_STATE"] = new Button(890.f, 650.f, 100.f, 50.f,
-		&this->font, "Quit", 70,
+		&Fonts::theme, "Quit", 70,
 		sf::Color(255, 0, 0, 200), sf::Color(250, 250, 250, 250), sf::Color(30, 30, 30, 50),
 		sf::Color(50, 50, 50, 0), sf::Color(150, 150, 150, 0), sf::Color(30, 30, 30, 0));
 }
@@ -89,7 +90,7 @@ void MainMenuState::HandleKey(sf::Keyboard::Key code)
 {
 	if (code == keybinds->at("GAME_STATE"))
 	{
-		this->states->push(new GameState(this->window, this->keybinds, this->states));
+		this->states->push(new GameState(this->window, this->keybinds, this->states, Fonts::theme));
 	}
 
 	if (code == keybinds->at("MAINMENU_EXIT"))
@@ -107,7 +108,7 @@ void MainMenuState::UpdateButtons()
 	// New Game
 	if (this->buttons["GAME_STATE"]->isPressed())
 	{
-		this->states->push(new GameState(this->window, this->keybinds, this->states));
+		this->states->push(new GameState(this->window, this->keybinds, this->states, Fonts::theme));
 	}
 
 	// Quit

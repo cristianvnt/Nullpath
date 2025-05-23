@@ -1,5 +1,6 @@
 #include "BSPGenerator.h"
 #include "BSPNode.h"
+
 #include <functional>
 #include <algorithm>
 
@@ -17,7 +18,7 @@ static inline std::pair<int, int> ToCell(const sf::Vector2f& p, int cellSize)
 	return { cellX, cellY };
 }
 
-void BSPGenerator::Generate(Map& map) const
+void BSPGenerator::Generate(Map& map)
 {
 	// Validate map dimensions
 	if (map.GetWidth() < 2 * minRoomSizeCells || map.GetHeight() < 2 * minRoomSizeCells)
@@ -36,15 +37,15 @@ void BSPGenerator::Generate(Map& map) const
 	sf::FloatRect fullArea({ 0.f, 0.f }, { widthPx, heightPx });
 
 	// Build BPS tree
-	BSPNode root(fullArea);
-	root.Split(minRoomSizeCells * map.GetCellSize(), splitRatio, 0);
-	root.GenerateRooms(minRoomSizeCells * map.GetCellSize(), paddingCells * map.GetCellSize());
-	root.CreateCorridors();
+	rootNode = std::make_unique<BSPNode>(fullArea);
+	rootNode->Split(minRoomSizeCells * map.GetCellSize(), splitRatio, 0);
+	rootNode->GenerateRooms(minRoomSizeCells * map.GetCellSize(), paddingCells * map.GetCellSize());
+	rootNode->CreateCorridors();
 
 	// Carve out floor tiles for each room
-	root.ForEachLeaf([&](const BSPNode& node)
+	rootNode->ForEachLeaf([&](const BSPNode& node)
 		{
-			sf::FloatRect r = node.Room();
+			sf::FloatRect r = node.GetRoom();
 
 			// Skip invalid rooms
 			if (r.size.x <= 0 || r.size.y <= 0)
@@ -70,7 +71,7 @@ void BSPGenerator::Generate(Map& map) const
 			if (!node)
 				return;
 
-			for (auto& seg : node->Corridors())
+			for (auto& seg : node->GetCorridors())
 			{
 				auto& [a, b] = seg;
 				auto [ax, ay] = ToCell(a, map.GetCellSize());
@@ -101,6 +102,60 @@ void BSPGenerator::Generate(Map& map) const
 			carveCorridors(node->Back());
 		};
 	
+	// Mark each leaf with a unique ID and remember its center
+	roomMarkers.clear();
+	int nextID = 1;
+	rootNode->ForEachLeaf([&](BSPNode& node)
+		{
+			sf::FloatRect r = node.GetRoom();
+
+			if (r.size.x <= 0 || r.size.y <= 0)
+				return;
+
+			node.SetRoomID(nextID);
+			roomMarkers.emplace_back(BSPNode::CenterRect(r), nextID);
+			std::cout << "Room #" << node.GetRoomID() << " center=(" << BSPNode::CenterRect(r).x << "," << BSPNode::CenterRect(r).y << ")\n";
+			nextID++;
+		});
+
 	// Start carving from the root
-	carveCorridors(&root);
+	carveCorridors(rootNode.get());
+}
+
+static void DrawNodeDebug(const BSPNode* node, sf::RenderTarget& target)
+{
+	if (!node)
+		return;
+
+	// Draw node's full bounds
+	sf::FloatRect bounds = node->GetBounds();
+	sf::RectangleShape rect({ bounds.size.x, bounds.size.y });
+	rect.setPosition({ bounds.position.x, bounds.position.y });
+	rect.setFillColor(sf::Color::Transparent);
+	rect.setOutlineColor(sf::Color::Blue);
+	rect.setOutlineThickness(2.f);
+	target.draw(rect);
+
+	// If leaf, draw the actual room inside
+	if (node->IsLeaf())
+	{
+		sf::FloatRect room = node->GetRoom();
+		sf::RectangleShape roomRect({ room.size.x, room.size.y });
+		roomRect.setPosition({ room.position.x, room.position.y });
+		roomRect.setFillColor(sf::Color::Transparent);
+		roomRect.setOutlineColor(sf::Color::Magenta);
+		roomRect.setOutlineThickness(2.f);
+		target.draw(roomRect);
+	}
+
+	DrawNodeDebug(node->Front(), target);
+	DrawNodeDebug(node->Back(), target);
+}
+
+void BSPGenerator::RenderDebug(sf::RenderTarget& target, const Map& map) const
+{
+	if (!rootNode)
+		return;
+
+	DrawNodeDebug(rootNode.get(), target);
 }

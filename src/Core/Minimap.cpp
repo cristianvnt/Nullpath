@@ -1,7 +1,8 @@
 #include "Minimap.h"
+#include <functional>
 
-Minimap::Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster)
-	: mapWidth(mapWidth), mapHeight(mapHeight), cellSize(cellSize), mapData(mapData), raycaster(raycaster)
+Minimap::Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster, const std::vector<std::pair<sf::Vector2f, int>>& markers, sf::Font& f)
+	: mapWidth(mapWidth), mapHeight(mapHeight), cellSize(cellSize), mapData(mapData), raycaster(raycaster), roomMarkers(markers), font(f)
 {
 	float mapWidthPx = mapWidth * cellSize;
 	float mapHeightPx = mapHeight * cellSize;
@@ -90,6 +91,23 @@ void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, flo
 		fovFill[i + 1].position = hitPoint;
 		fovFill[i + 1].color = sf::Color::Yellow;
 	}
-
 	target.draw(fovFill);
+
+	// Debug
+	if (drawRoomIDs)
+	{
+		for (auto& [center, id] : roomMarkers)
+		{
+			float x = margin + (center.x / cellSize) * (cellSize * scaleX);
+			float y = margin + (center.y / cellSize) * (cellSize * scaleY);
+
+			sf::Text txt(font, std::to_string(id), 15);
+			txt.setFillColor(sf::Color::Magenta);
+
+			sf::FloatRect bounds = txt.getLocalBounds();
+			txt.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 2.f });
+			txt.setPosition({ x, y });
+			target.draw(txt);
+		}
+	}
 }

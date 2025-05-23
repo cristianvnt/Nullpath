@@ -1,7 +1,7 @@
 ﻿#include "BSPNode.h"
 #include "Core/Math.h"
 
-static constexpr int MAX_DEPTH = 4;
+static constexpr int MAX_DEPTH = 3;
 
 BSPNode::BSPNode(const sf::FloatRect& area)
 	: bounds(area),
@@ -120,7 +120,7 @@ const BSPNode* BSPNode::getRoomNode() const
 	return found;
 }
 
-sf::Vector2f BSPNode::centerRect(const sf::FloatRect& rect)
+sf::Vector2f BSPNode::CenterRect(const sf::FloatRect& rect)
 {
 	return {
 		rect.position.x + rect.size.x * 0.5f,
@@ -189,36 +189,12 @@ void BSPNode::CreateCorridors()
 
 	if (fNode && bNode) 
 	{
-		sf::Vector2f centerF = centerRect(fNode->room);
-		sf::Vector2f centerB = centerRect(bNode->room);
+		sf::Vector2f centerF = CenterRect(fNode->room);
+		sf::Vector2f centerB = CenterRect(bNode->room);
 
 		carveBetween(centerF, centerB);
 	}
 
 	frontNode->CreateCorridors();
 	backNode->CreateCorridors();
-}
-
-void BSPNode::RenderDebug(sf::RenderWindow& window) const
-{
-	sf::RectangleShape rect({ bounds.size.x, bounds.size.y });
-	rect.setPosition({ bounds.position.x, bounds.position.y });
-	rect.setFillColor(sf::Color::Transparent);
-	rect.setOutlineColor(sf::Color::Blue);
-	rect.setOutlineThickness(2.f);
-	window.draw(rect);
-
-	if (isLeaf)
-	{
-		rect.setSize({ room.size.x, room.size.y });
-		rect.setPosition({ room.position.x, room.position.y });
-		rect.setOutlineColor(sf::Color::Magenta);
-		window.draw(rect);
-	}
-
-	for (auto& c : corridors)
-	{
-		sf::Vertex line[] = { {c.first, sf::Color::Yellow}, {c.second, sf::Color::Yellow} };
-		window.draw(line, 2, sf::PrimitiveType::Lines);
-	}
 }

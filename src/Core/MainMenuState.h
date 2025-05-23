@@ -10,7 +10,6 @@ private:
 	// Vars
 	sf::Texture backgroundTexture;
 	sf::RectangleShape background;
-	sf::Font font;
 
 	std::map<std::string, Button*> buttons;
 

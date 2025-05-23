@@ -21,8 +21,16 @@ private:
 	float fov = 60.f * (Math::PI / 180.f);
 	int slices = 60;
 
+	std::vector<std::pair<sf::Vector2f, int>> roomMarkers;
+	sf::Font& font;
+
+	bool drawRoomIDs = false;
+
 public:
-	Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster);
+	Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster, const std::vector<std::pair<sf::Vector2f, int>>& markers, sf::Font& f);
+
+	void SetDrawRoomIDs(bool b) { drawRoomIDs = b; }
+	bool GetDrawRoomIDs() const { return drawRoomIDs; }
 
 	void Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle);
 };

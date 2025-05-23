@@ -27,8 +27,15 @@ private:
 
 	void RegenerateWorld(const std::function<void(Map&)>& generator);
 
+	// BSP debug state
+	std::unique_ptr<BSPGenerator> bspGen;
+	std::vector<std::pair<sf::Vector2f, int>> roomMarkers;
+	bool showDebug = false;
+	bool usingBSP = false;
+	sf::Font& debugFont;
+
 public:
-	GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states);
+	GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states, sf::Font& sharedFont);
 	virtual ~GameState();
 
 	void HandleKey(sf::Keyboard::Key code) override;

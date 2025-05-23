@@ -86,6 +86,8 @@ void Game::InitKeybinds()
 			keyCode = sf::Keyboard::Key::Escape;
 		else if (keyStr == "Enter") 
 			keyCode = sf::Keyboard::Key::Enter;
+		else if (keyStr == "O")
+			keyCode = sf::Keyboard::Key::O;
 
 		this->keybinds[fnc] = keyCode;
 	}
