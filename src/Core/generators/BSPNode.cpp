@@ -1,7 +1,7 @@
 ﻿#include "BSPNode.h"
 #include "Core/Math.h"
 
-static constexpr int MAX_DEPTH = 5;
+static constexpr int MAX_DEPTH = 4;
 
 BSPNode::BSPNode(const sf::FloatRect& area)
 	: bounds(area),

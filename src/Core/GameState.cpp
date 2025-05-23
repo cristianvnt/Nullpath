@@ -5,7 +5,8 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboar
 	player(new Player()),
 	raycaster(nullptr),
 	map(30, 30, 32),
-	minimap(nullptr)
+	minimap(nullptr),
+	showMinimap(false)
 {
 	this->InitWorldDFS();
 }
@@ -28,7 +29,7 @@ void GameState::InitWorldDFS()
 void GameState::InitWorldBSP()
 {
 	RegenerateWorld([&](Map& map) {
-		BSPGenerator bsp(3, 1.25f, 2);
+		BSPGenerator bsp(1, 1.25f, 2);
 		bsp.Generate(map);
 	});
 }
@@ -38,7 +39,7 @@ void GameState::RegenerateWorld(const std::function<void(Map&)>& generator)
 	map.Clear(Cell::Wall);
 	generator(map);
 
-	// Place player ona random empty cell (odd coords to ensure valid paths)
+	// Place player on a random empty cell (odd coords to ensure valid paths)
 	if (std::optional<std::pair<int, int>> pos = map.FindRandomEmpty(); pos)
 	{
 		auto& [px, py] = *pos;
@@ -46,7 +47,7 @@ void GameState::RegenerateWorld(const std::function<void(Map&)>& generator)
 		player->SetPosition(px * map.GetCellSize() + offset, py * map.GetCellSize() + offset);
 	}
 
-	// Reinit raycaster with the current map and player
+	// Reinitialize raycaster with the current map and player
 	if (raycaster)
 		delete raycaster;
 
@@ -81,6 +82,9 @@ void GameState::HandleKey(sf::Keyboard::Key code)
 
 	if (code == sf::Keyboard::Key::T)
 		InitWorldBSP();
+
+	if (code == sf::Keyboard::Key::M)
+		showMinimap = !showMinimap;
 }
 
 void GameState::Update(float dt)
@@ -106,7 +110,8 @@ void GameState::Render(sf::RenderTarget* target)
 		this->player->GetAngle()
 	);
 
-	minimap->Render(*target, player->GetX(), player->GetY(), player->GetAngle());
+	if (showMinimap && minimap)
+		minimap->Render(*target, player->GetX(), player->GetY(), player->GetAngle());
 }
 
 int GameState::GetCell(int x, int y) const

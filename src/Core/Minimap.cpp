@@ -5,27 +5,29 @@ Minimap::Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, 
 {
 	float mapWidthPx = mapWidth * cellSize;
 	float mapHeightPx = mapHeight * cellSize;
-	scale = std::min(maxSize / mapWidthPx, maxSize / mapHeightPx);
+	scaleX = maxWidth / mapWidthPx;
+	scaleY = maxHeight / mapHeightPx;
 }
 
 void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle)
 {
-	float miniCell = cellSize * scale;
-	sf::RectangleShape cell({ miniCell, miniCell });
-	const float margin = 10.f;
+	float miniCellX = cellSize * scaleX;
+	float miniCellY = cellSize * scaleY;
+	sf::RectangleShape cell({ miniCellX, miniCellY });
+
 	for (int y = 0; y < mapHeight; y++)
 	{
 		for (int x = 0; x < mapWidth; x++)
 		{
 			int v = mapData[y * mapWidth + x];
 			cell.setFillColor(v > 0 ? sf::Color(30, 60, 60) : sf::Color(180, 180, 180));
-			cell.setPosition({ margin + x * miniCell, margin + y * miniCell });
+			cell.setPosition({ margin + x * miniCellX, margin + y * miniCellY });
 			target.draw(cell);
 		}
 	}
 
 	// Draw border around
-	sf::RectangleShape border({ mapWidth * miniCell + 2.f, mapHeight * miniCell + 2.f });
+	sf::RectangleShape border({ mapWidth * miniCellX + 2.f, mapHeight * miniCellY + 2.f });
 	border.setPosition({ margin - 1.f, margin - 1.f });
 	border.setFillColor(sf::Color::Transparent);
 	border.setOutlineColor(sf::Color::White);
@@ -41,11 +43,11 @@ void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, flo
 	float cellY = worldY / cellSize;
 
 	// Mini-map dot coordinates
-	float dotX = margin + cellX * miniCell;
-	float dotY = margin + cellY * miniCell;
+	float dotX = margin + cellX * miniCellX;
+	float dotY = margin + cellY * miniCellY;
 
 	// Dot player on mini-map
-	sf::CircleShape dot(miniCell * 0.25f);
+	sf::CircleShape dot(miniCellX * 0.25f);
 	dot.setOrigin({ dot.getRadius(), dot.getRadius() });
 	dot.setFillColor(sf::Color::Red);
 	dot.setPosition({ dotX, dotY });
@@ -59,13 +61,13 @@ void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, flo
 
 	sf::Vector2f dotPlayer{ dotX, dotY };
 	sf::Vector2f endPointL{
-		margin + (hitL.hitWorldX / cellSize) * miniCell,
-		margin + (hitL.hitWorldY / cellSize) * miniCell,
+		margin + (hitL.hitWorldX / cellSize) * miniCellX,
+		margin + (hitL.hitWorldY / cellSize) * miniCellY,
 	};
 
 	sf::Vector2f endPointR{
-		margin + (hitR.hitWorldX / cellSize) * miniCell,
-		margin + (hitR.hitWorldY / cellSize) * miniCell,
+		margin + (hitR.hitWorldX / cellSize) * miniCellX,
+		margin + (hitR.hitWorldY / cellSize) * miniCellY,
 	};
 
 	// Color the FOV
@@ -81,8 +83,8 @@ void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, flo
 		// Cast ray at normalized angle
 		auto hit = raycaster->CastRay(worldX, worldY, a);
 		sf::Vector2f hitPoint{
-			margin + (hit.hitWorldX / cellSize) * miniCell,
-			margin + (hit.hitWorldY / cellSize) * miniCell,
+			margin + (hit.hitWorldX / cellSize) * miniCellX,
+			margin + (hit.hitWorldY / cellSize) * miniCellY,
 		};
 
 		fovFill[i + 1].position = hitPoint;

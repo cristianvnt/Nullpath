@@ -15,7 +15,6 @@ private:
 	std::map<std::string, Button*> buttons;
 
 	// Functions
-	void InitVariables();
 	void InitBackground();
 	void InitFonts();
 	void InitKeybinds() override;

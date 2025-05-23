@@ -20,6 +20,8 @@ private:
 	Minimap* minimap;
 	Map map;
 
+	bool showMinimap;
+
 	void InitWorldDFS();
 	void InitWorldBSP();
 

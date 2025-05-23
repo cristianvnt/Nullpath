@@ -14,8 +14,10 @@ private:
 	Raycaster* raycaster;
 
 	float margin = 10.f;
-	float scale = 1.f;
-	float maxSize = 400.f;
+	float scaleX = 1.f;
+	float scaleY = 1.f;
+	float maxWidth = 600.f;
+	float maxHeight = 400.f;
 	float fov = 60.f * (Math::PI / 180.f);
 	int slices = 60;
 
