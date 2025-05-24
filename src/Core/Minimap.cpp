@@ -12,15 +12,37 @@ Minimap::Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, 
 
 sf::FloatRect Minimap::WorldToMini(const sf::FloatRect& worldRect) const
 {
-	float cellL = worldRect.position.x / cellSize;
-	float cellT = worldRect.position.y / cellSize;
-	float cellW = worldRect.size.x / cellSize;
-	float cellH = worldRect.size.y / cellSize;
+	// Snap world coords to integer cell indices
+	int x0 = static_cast<int>(std::floor(worldRect.position.x / cellSize));
+	int y0 = static_cast<int>(std::floor(worldRect.position.y / cellSize));
+	int x1 = static_cast<int>(std::ceil((worldRect.position.x + worldRect.size.x) / cellSize));
+	int y1 = static_cast<int>(std::ceil((worldRect.position.y + worldRect.size.y) / cellSize));
 
-	float miniW = cellSize * scaleX;
-	float miniH = cellSize * scaleY;
+	// Clamp to map bounds
+	x0 = std::clamp(x0, 0, mapWidth);
+	y0 = std::clamp(y0, 0, mapHeight);
+	x1 = std::clamp(x1, 0, mapWidth);
+	y1 = std::clamp(y1, 0, mapHeight);
 
-	return { {margin + cellL * miniW, margin + cellT * miniH}, {cellW * miniW, cellH * miniH} };
+	// Convert cells -> minimap pixels
+	float miniCellX = cellSize * scaleX;
+	float miniCellY = cellSize * scaleY;
+
+	float mx = margin + x0 * miniCellX;
+	float my = margin + y0 * miniCellY;
+	float mw = (x1 - x0) * miniCellX;
+	float mh = (y1 - y0) * miniCellY;
+
+	return { {mx, my}, {mw, mh} };
+}
+
+sf::Vector2f Minimap::WorldToMiniPoint(const sf::Vector2f& worldPoint) const
+{
+	float miniCellX = cellSize * scaleX;
+	float miniCellY = cellSize * scaleY;
+	float mx = margin + (worldPoint.x / cellSize) * miniCellX;
+	float my = margin + (worldPoint.y / cellSize) * miniCellY;
+	return { mx, my };
 }
 
 void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle)
@@ -114,29 +136,43 @@ void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, flo
 				if (!node)
 					return;
 
-				// Blue partition outline
-				sf::FloatRect miniBounds = WorldToMini(node->GetBounds());
-				sf::RectangleShape partition({ miniBounds.size.x, miniBounds.size.y });
-				partition.setPosition({ miniBounds.position.x, miniBounds.position.y });
-				partition.setFillColor(sf::Color::Transparent);
-				partition.setOutlineColor(sf::Color::Blue);
-				partition.setOutlineThickness(2.f);
-				target.draw(partition);
-
 				if (node->IsLeaf())
 				{
-					// Red room carve
-					sf::FloatRect miniRoom = WorldToMini(node->GetRoom());
-					sf::RectangleShape roomRect({ miniRoom.size.x, miniRoom.size.y });
-					roomRect.setPosition({ miniRoom.position.x, miniRoom.position.y });
-					roomRect.setFillColor(sf::Color::Transparent);
-					roomRect.setOutlineColor(sf::Color::Red);
-					roomRect.setOutlineThickness(2.f);
-					target.draw(roomRect);
+					const sf::FloatRect& room = node->GetRoom();
+					if (room.size.x > 0) {
+						sf::FloatRect miniRoom = WorldToMini(room);
+						sf::RectangleShape roomRect(miniRoom.size);
+						roomRect.setPosition(miniRoom.position);
+						roomRect.setFillColor(sf::Color::Transparent);
+						roomRect.setOutlineColor(sf::Color::Red);
+						roomRect.setOutlineThickness(2.f);
+						target.draw(roomRect);
+					}
 				}
 
-				DrawNodeDebug(node->Front());
-				DrawNodeDebug(node->Back());
+				if (node->Front() && node->Back())
+				{
+					sf::FloatRect frontB = node->Front()->GetBounds();
+					sf::FloatRect backB = node->Back()->GetBounds();
+					sf::Vector2f start, end;
+
+					if (std::abs((frontB.position.x + frontB.size.x) - backB.position.x) < 0.1f) {
+						// Vertical split
+						start = { backB.position.x, backB.position.y };
+						end = { backB.position.x, backB.position.y + backB.size.y };
+					}
+					else {
+						// horizontal split
+						start = { backB.position.x, backB.position.y };
+						end = { backB.position.x + backB.size.x, backB.position.y };
+					}
+
+					sf::Vertex line[] = { sf::Vertex({WorldToMiniPoint(start), sf::Color::Blue}), sf::Vertex({WorldToMiniPoint(end), sf::Color::Blue}) };
+					target.draw(line, 2, sf::PrimitiveType::Lines);
+
+					DrawNodeDebug(node->Front());
+					DrawNodeDebug(node->Back());
+				}
 			};
 
 		DrawNodeDebug(debugRoot);

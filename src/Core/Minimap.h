@@ -37,6 +37,7 @@ public:
 
 	// World size to minimap
 	sf::FloatRect WorldToMini(const sf::FloatRect& worldRect) const;
+	sf::Vector2f WorldToMiniPoint(const sf::Vector2f& worldPoint) const;
 
 	void Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle);
 };
