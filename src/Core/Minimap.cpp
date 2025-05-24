@@ -148,7 +148,7 @@ void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, flo
 			float y = margin + (center.y / cellSize) * (cellSize * scaleY);
 
 			sf::Text txt(font, std::to_string(id), 15);
-			txt.setFillColor(sf::Color::Yellow);
+			txt.setFillColor(sf::Color::Black);
 
 			sf::FloatRect bounds = txt.getLocalBounds();
 			txt.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 2.f });
