@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Raycaster.h"
+#include "generators/BSPNode.h"
 
 class Minimap
 {
@@ -23,12 +24,13 @@ private:
 
 	std::vector<std::pair<sf::Vector2f, int>> roomMarkers;
 	sf::Font& font;
+	const BSPNode* debugRoot = nullptr;
 
 	bool drawRoomIDs = false;
 
 public:
 	Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster, 
-		const std::vector<std::pair<sf::Vector2f, int>>& markers, sf::Font& f);
+		const std::vector<std::pair<sf::Vector2f, int>>& markers, sf::Font& f, const BSPNode* debugRoot = nullptr);
 
 	void SetDrawRoomIDs(bool b) { drawRoomIDs = b; }
 	bool GetDrawRoomIDs() const { return drawRoomIDs; }

@@ -24,9 +24,6 @@ public:
 
 	// Expose the built BSP tree root for debug rendering
 	const BSPNode* GetRootNode() const { return rootNode.get(); }
-
-	// Draw split lines and room boxes
-	void RenderDebug(sf::RenderTarget& target, const Minimap& mini) const;
 };
 
 #endif // !BPSGENERATOR_H

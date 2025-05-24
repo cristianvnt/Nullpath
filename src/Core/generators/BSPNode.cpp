@@ -138,27 +138,26 @@ void BSPNode::Split(int minSizePx, float splitRatio, int depth)
 
 	bool horizontal;
 	float offset;
-	sf::FloatRect region = bounds;
-	if (!canSplit(minSizePx) || !choosePartition(region, minSizePx, splitRatio, horizontal, offset))
+	if (!canSplit(minSizePx) || !choosePartition(bounds, minSizePx, splitRatio, horizontal, offset))
 	{
 		isLeaf = true;
 		return;
 	}
 
 	isLeaf = false;
-	sf::FloatRect rectF = region;
-	sf::FloatRect rectB = region;
+	sf::FloatRect rectF = bounds;
+	sf::FloatRect rectB = bounds;
 	if (horizontal)
 	{
 		rectF.size.y = offset;
 		rectB.position.y += offset;
-		rectB.size.y = region.size.y - offset;
+		rectB.size.y = bounds.size.y - offset;
 	}
 	else
 	{
 		rectF.size.x = offset;
 		rectB.position.x += offset;
-		rectB.size.x = region.size.x - offset;
+		rectB.size.x = bounds.size.x - offset;
 	}
 
 	frontNode = std::make_unique<BSPNode>(rectF);

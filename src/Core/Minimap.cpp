@@ -1,8 +1,8 @@
 #include "Minimap.h"
 #include <functional>
 
-Minimap::Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster, const std::vector<std::pair<sf::Vector2f, int>>& markers, sf::Font& f)
-	: mapWidth(mapWidth), mapHeight(mapHeight), cellSize(cellSize), mapData(mapData), raycaster(raycaster), roomMarkers(markers), font(f)
+Minimap::Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster, const std::vector<std::pair<sf::Vector2f, int>>& markers, sf::Font& f, const BSPNode* debugRoot)
+	: mapWidth(mapWidth), mapHeight(mapHeight), cellSize(cellSize), mapData(mapData), raycaster(raycaster), roomMarkers(markers), font(f), debugRoot(debugRoot)
 {
 	float mapWidthPx = mapWidth * cellSize;
 	float mapHeightPx = mapHeight * cellSize;
@@ -107,15 +107,48 @@ void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, flo
 	target.draw(fovFill);
 
 	// Debug
-	if (drawRoomIDs)
+	if (drawRoomIDs && debugRoot)
 	{
+		std::function<void(const BSPNode*)> DrawNodeDebug = [&](const BSPNode* node)
+			{
+				if (!node)
+					return;
+
+				// Blue partition outline
+				sf::FloatRect miniBounds = WorldToMini(node->GetBounds());
+				sf::RectangleShape partition({ miniBounds.size.x, miniBounds.size.y });
+				partition.setPosition({ miniBounds.position.x, miniBounds.position.y });
+				partition.setFillColor(sf::Color::Transparent);
+				partition.setOutlineColor(sf::Color::Blue);
+				partition.setOutlineThickness(2.f);
+				target.draw(partition);
+
+				if (node->IsLeaf())
+				{
+					// Red room carve
+					sf::FloatRect miniRoom = WorldToMini(node->GetRoom());
+					sf::RectangleShape roomRect({ miniRoom.size.x, miniRoom.size.y });
+					roomRect.setPosition({ miniRoom.position.x, miniRoom.position.y });
+					roomRect.setFillColor(sf::Color::Transparent);
+					roomRect.setOutlineColor(sf::Color::Red);
+					roomRect.setOutlineThickness(2.f);
+					target.draw(roomRect);
+				}
+
+				DrawNodeDebug(node->Front());
+				DrawNodeDebug(node->Back());
+			};
+
+		DrawNodeDebug(debugRoot);
+		
+		// Draw room number
 		for (auto& [center, id] : roomMarkers)
 		{
 			float x = margin + (center.x / cellSize) * (cellSize * scaleX);
 			float y = margin + (center.y / cellSize) * (cellSize * scaleY);
 
 			sf::Text txt(font, std::to_string(id), 15);
-			txt.setFillColor(sf::Color::Magenta);
+			txt.setFillColor(sf::Color::Yellow);
 
 			sf::FloatRect bounds = txt.getLocalBounds();
 			txt.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 2.f });
