@@ -22,7 +22,6 @@ GameState::~GameState()
 
 void GameState::InitWorldDFS()
 {
-	showDebug = false;
 	usingBSP = false;
 	RegenerateWorld([&](Map& map) {
 		DFSGenerator dfs;
@@ -32,7 +31,6 @@ void GameState::InitWorldDFS()
 
 void GameState::InitWorldBSP()
 {
-	showDebug = false;
 	usingBSP = true;
 	bspGen = std::make_unique<BSPGenerator>(3, 1.25f, 2);
 	RegenerateWorld([&](Map& map) {
@@ -131,8 +129,8 @@ void GameState::Render(sf::RenderTarget* target)
 	if (showMinimap && minimap)
 		minimap->Render(*target, player->GetX(), player->GetY(), player->GetAngle());
 
-	if (usingBSP && showDebug)
-		bspGen->RenderDebug(*target, map);
+	if (usingBSP && showDebug && minimap)
+		bspGen->RenderDebug(*target, *minimap);
 }
 
 int GameState::GetCell(int x, int y) const

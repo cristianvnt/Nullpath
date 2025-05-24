@@ -10,6 +10,19 @@ Minimap::Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, 
 	scaleY = maxHeight / mapHeightPx;
 }
 
+sf::FloatRect Minimap::WorldToMini(const sf::FloatRect& worldRect) const
+{
+	float cellL = worldRect.position.x / cellSize;
+	float cellT = worldRect.position.y / cellSize;
+	float cellW = worldRect.size.x / cellSize;
+	float cellH = worldRect.size.y / cellSize;
+
+	float miniW = cellSize * scaleX;
+	float miniH = cellSize * scaleY;
+
+	return { {margin + cellL * miniW, margin + cellT * miniH}, {cellW * miniW, cellH * miniH} };
+}
+
 void Minimap::Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle)
 {
 	float miniCellX = cellSize * scaleX;

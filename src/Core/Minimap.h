@@ -27,10 +27,14 @@ private:
 	bool drawRoomIDs = false;
 
 public:
-	Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster, const std::vector<std::pair<sf::Vector2f, int>>& markers, sf::Font& f);
+	Minimap(int mapWidth, int mapHeight, int cellSize, const int* mapData, Raycaster* raycaster, 
+		const std::vector<std::pair<sf::Vector2f, int>>& markers, sf::Font& f);
 
 	void SetDrawRoomIDs(bool b) { drawRoomIDs = b; }
 	bool GetDrawRoomIDs() const { return drawRoomIDs; }
+
+	// World size to minimap
+	sf::FloatRect WorldToMini(const sf::FloatRect& worldRect) const;
 
 	void Render(sf::RenderTarget& target, float playerX, float playerY, float playerAngle);
 };

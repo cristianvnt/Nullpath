@@ -122,15 +122,16 @@ void BSPGenerator::Generate(Map& map)
 	carveCorridors(rootNode.get());
 }
 
-static void DrawNodeDebug(const BSPNode* node, sf::RenderTarget& target)
+static void DrawNodeDebug(const BSPNode* node, sf::RenderTarget& target, const Minimap& mini)
 {
 	if (!node)
 		return;
 
 	// Draw node's full bounds
 	sf::FloatRect bounds = node->GetBounds();
-	sf::RectangleShape rect({ bounds.size.x, bounds.size.y });
-	rect.setPosition({ bounds.position.x, bounds.position.y });
+	sf::FloatRect miniBounds = mini.WorldToMini(bounds);
+	sf::RectangleShape rect({ miniBounds.size.x, miniBounds.size.y });
+	rect.setPosition({ miniBounds.position.x, miniBounds.position.y });
 	rect.setFillColor(sf::Color::Transparent);
 	rect.setOutlineColor(sf::Color::Blue);
 	rect.setOutlineThickness(2.f);
@@ -140,22 +141,23 @@ static void DrawNodeDebug(const BSPNode* node, sf::RenderTarget& target)
 	if (node->IsLeaf())
 	{
 		sf::FloatRect room = node->GetRoom();
-		sf::RectangleShape roomRect({ room.size.x, room.size.y });
-		roomRect.setPosition({ room.position.x, room.position.y });
+		sf::FloatRect miniRoom = mini.WorldToMini(room);
+		sf::RectangleShape roomRect({ miniRoom.size.x, miniRoom.size.y });
+		roomRect.setPosition({ miniRoom.position.x, miniRoom.position.y });
 		roomRect.setFillColor(sf::Color::Transparent);
 		roomRect.setOutlineColor(sf::Color::Magenta);
 		roomRect.setOutlineThickness(2.f);
 		target.draw(roomRect);
 	}
 
-	DrawNodeDebug(node->Front(), target);
-	DrawNodeDebug(node->Back(), target);
+	DrawNodeDebug(node->Front(), target, mini);
+	DrawNodeDebug(node->Back(), target, mini);
 }
 
-void BSPGenerator::RenderDebug(sf::RenderTarget& target, const Map& map) const
+void BSPGenerator::RenderDebug(sf::RenderTarget& target, const Minimap& mini) const
 {
 	if (!rootNode)
 		return;
 
-	DrawNodeDebug(rootNode.get(), target);
+	DrawNodeDebug(rootNode.get(), target, mini);
 }
