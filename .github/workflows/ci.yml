@@ -31,6 +31,7 @@ jobs:
                     libxi-dev \
                     libgl1-mesa-dev \
                     libudev-dev \
+                    libfreetype6-dev
       
             - name: Configure
               run: cmake -B build -DBUILD_SHARED_LIBS=TRUE
