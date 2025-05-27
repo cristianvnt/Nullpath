@@ -1,4 +1,5 @@
 #include "DFSGenerator.h"
+#include <algorithm>
 
 void DFSGenerator::Carve(int x, int y, Map& map)
 {
