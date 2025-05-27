@@ -1,29 +1,43 @@
 name: CI
 
 on: 
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
-defaults:
-  run:
-    shell: bash
+    push:
+        branches: [ master ]
+    pull_request:
+        branches: [ master ]
 
 jobs:
-  build:
-    name: Windows Build
-    runs-on: windows-2022
+    build:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ windows-2022, ubuntu-latest ]
+    
+        defaults:
+            run:
+                shell: bash
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+        steps:
+            - uses: actions/checkout@v4
+  
+            - name: Install dependencies (Linux)
+              if: runner.os == `Linux`
+              run: sudo apt-get update && sudo apt-get install -y libsfml-dev clang-format
       
-    - name: Configure
-      run: |
-        cmake -B build -DBUILD_SHARED_LIBS=TRUE
+            - name: Configure
+              run: cmake -B build -DBUILD_SHARED_LIBS=TRUE
         
-    - name: Build
-      run: cmake --build build --config Release
+            - name: Build
+              run: cmake --build build --config Release
+
+            - name: Run Tests
+              run: |
+                cd build
+                ctest --output-on-failure || true
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: Nullpath-${{ matrix.os }}
+                path: build/Nullpath
+            
