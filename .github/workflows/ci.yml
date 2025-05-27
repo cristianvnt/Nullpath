@@ -24,7 +24,19 @@ jobs:
               if: runner.os == 'Linux'
               run: |
                   sudo apt-get update
-                  sudo apt-get install -y libsfml-all-dev
+                  sudo apt-get install -y \
+                    build-essential cmake pkg-config \
+                    libxrandr-dev \
+                    libxcursor-dev \
+                    libxi-dev \
+                    libxxf86vm-dev \
+                    libgl1-mesa-dev \
+                    libudev-dev \
+                    libfreetype6-dev \
+                    libopenal-dev \
+                    libsndfile1-dev \
+                    libogg-dev \
+                    libvorbis-dev
       
             - name: Configure
               run: cmake -B build -DBUILD_SHARED_LIBS=TRUE
