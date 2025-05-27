@@ -30,6 +30,7 @@ jobs:
                     libxcursor-dev \
                     libxi-dev \
                     libgl1-mesa-dev \
+                    libudev-dev \
       
             - name: Configure
               run: cmake -B build -DBUILD_SHARED_LIBS=TRUE
