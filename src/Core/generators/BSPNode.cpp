@@ -1,5 +1,5 @@
 ﻿#include "BSPNode.h"
-#include "Core/Math.h"
+#include "Utils/Math.h"
 
 static constexpr int MAX_DEPTH = 3;
 

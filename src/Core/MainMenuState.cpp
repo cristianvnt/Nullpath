@@ -1,5 +1,5 @@
 ﻿#include "MainMenuState.h"
-#include "Fonts.h"
+#include "Utils/Fonts.h"
 
 MainMenuState::MainMenuState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states)
 	: State(window, keybinds, states)

@@ -1,5 +1,5 @@
 #include "GameState.h"
-#include "Fonts.h"
+#include "Utils/Fonts.h"
 
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, sf::Keyboard::Key>* keybinds, std::stack<State*>* states, sf::Font& sharedFont)
 	: State(window, keybinds, states),

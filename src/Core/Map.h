@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "Math.h"
+#include "Utils/Math.h"
 #include <vector>
 #include <random>
 #include <array>
