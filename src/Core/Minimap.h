@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Raycaster.h"
-#include "generators/BSPNode.h"
+#include "Generators/BSPNode.h"
 
 class Minimap
 {

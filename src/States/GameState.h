@@ -2,12 +2,12 @@
 #define GAME_STATE_H
 
 #include "State.h"
-#include "Raycaster.h"
+#include "Core/Raycaster.h"
 #include "Entities/Player.h"
-#include "Minimap.h"
-#include "Map.h"
-#include "generators/DFSGenerator.h"
-#include "generators/BSPGenerator.h"
+#include "Core/Minimap.h"
+#include "Core/Map.h"
+#include "Generators/DFSGenerator.h"
+#include "Generators/BSPGenerator.h"
 
 #include <vector>
 #include <random>
