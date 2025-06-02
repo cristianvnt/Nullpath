@@ -218,8 +218,19 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 
 		// Determine line height on screen
 		int lineHeight = static_cast<int>(screenHeight / perpWallDist);
-		float drawStart = screenHeight / 2.f - lineHeight / 2.f;
-		float drawEnd = screenHeight / 2.f + lineHeight / 2.f;
+
+		// Calculate original (unclamped) draw positions
+		float originalDrawStart = screenHeight / 2.f - lineHeight / 2.f;
+		float originalDrawEnd = screenHeight / 2.f + lineHeight / 2.f;
+
+		// Apply clipping for rendering
+		float clampedDrawStart = originalDrawStart;
+		float clampedDrawEnd = originalDrawEnd;
+
+		if (clampedDrawStart < 0.f)
+			clampedDrawStart = 0.f;
+		if (clampedDrawEnd >= screenHeight)
+			clampedDrawEnd = screenHeight - 1.f;
 
 		// UV mapping: calculate exact hit position on wall
 		float wallX;
@@ -238,9 +249,15 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 		const sf::Texture& tex = wallTextures[texId];
 		sf::Vector2f texSize = static_cast<sf::Vector2f>(tex.getSize());
 
-		// Calculate texture coordinates
+		// Calculate texture coordinates based on visible portion
+		float totalWallHeight = originalDrawEnd - originalDrawStart;
+		float visibleTop = (clampedDrawStart - originalDrawStart) / totalWallHeight;
+		float visibleBottom = (clampedDrawEnd - originalDrawStart) / totalWallHeight;
+
 		float u0 = float(texX);
 		float u1 = float(texX + 1);
+		float v0 = visibleTop * textureSize;
+		float v1 = visibleBottom * textureSize;
 
 		// Apply slight darkening to side walls for better depth perception
 		sf::Color wallColor = (side == 1) ? sf::Color(180, 180, 180) : sf::Color::White;
@@ -249,14 +266,14 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 		sf::VertexArray& currentWalls = texturedWalls[texId];
 
 		// Triangle 1: top-left, top-right, bottom-right
-		currentWalls.append(sf::Vertex{ { float(ray), float(drawStart) }, wallColor, { u0, 0.f } });
-		currentWalls.append(sf::Vertex{ { float(ray + 1), float(drawStart) }, wallColor, { u1, 0.f } });
-		currentWalls.append(sf::Vertex{ { float(ray + 1), float(drawEnd) }, wallColor, { u1, textureSize } });
+		currentWalls.append(sf::Vertex{ { float(ray), clampedDrawStart }, wallColor, { u0, v0 } });
+		currentWalls.append(sf::Vertex{ { float(ray + 1), clampedDrawStart }, wallColor, { u1, v0 } });
+		currentWalls.append(sf::Vertex{ { float(ray + 1), clampedDrawEnd }, wallColor, { u1, v1 } });
 
 		// Triangle 2: bottom-right, bottom-left, top-left
-		currentWalls.append(sf::Vertex{ { float(ray + 1), float(drawEnd) }, wallColor, { u1, textureSize } });
-		currentWalls.append(sf::Vertex{ { float(ray), float(drawEnd) }, wallColor, { u0, textureSize } });
-		currentWalls.append(sf::Vertex{ { float(ray), float(drawStart) }, wallColor, { u0, 0.f } });
+		currentWalls.append(sf::Vertex{ { float(ray + 1), clampedDrawEnd }, wallColor, { u1, v1 } });
+		currentWalls.append(sf::Vertex{ { float(ray), clampedDrawEnd }, wallColor, { u0, v1 } });
+		currentWalls.append(sf::Vertex{ { float(ray), clampedDrawStart }, wallColor, { u0, v0 } });
 
 	}
 
