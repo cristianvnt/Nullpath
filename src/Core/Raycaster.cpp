@@ -111,11 +111,11 @@ void Raycaster::Render(sf::RenderTarget& target, float playerX, float playerY, f
 
 	// Floor and ceiling
 	sf::RectangleShape ceiling({static_cast<float>(screenWidth), static_cast<float>(screenHeight) / 2.f});
-	ceiling.setFillColor(sf::Color(150, 150, 150));
+	ceiling.setFillColor(sf::Color(102, 178, 255));
 	target.draw(ceiling);
 
 	sf::RectangleShape floor({static_cast<float>(screenWidth), static_cast<float>(screenHeight) / 2.f});
-	floor.setFillColor(sf::Color(50, 50, 50));
+	floor.setFillColor(sf::Color(76, 153, 0));
 	floor.setPosition({ 0.f, static_cast<float>(screenHeight) / 2.f });
 	target.draw(floor);
 
